@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# VS Code
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Datasets
+CUHK-PEDES/
+fscoco/
+
+# Large datasets / archives
+*.zip
+
+# Model checkpoints
+checkpoints/
+exported_models/
+
+# Environment / secrets
+.env
+
+# Large model files
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.bin
+*.safetensors
+
+TASK-former/sketch_jpg/
