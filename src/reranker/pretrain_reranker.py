@@ -78,18 +78,94 @@ def extract_embeddings(model, loader, device):
     return queries, photos
 
 
+def mine_semi_hard_negatives(
+    q_batch: torch.Tensor,
+    p_batch: torch.Tensor,
+    all_photos: torch.Tensor,
+    margin: float = 0.3,
+) -> torch.Tensor:
+    """
+    Semi-hard negative mining for triplet training.
+
+    For each anchor query q_i with positive photo p_i:
+      1. Compute similarity to ALL photos in the gallery.
+      2. Exclude the ground-truth positive (index i in all_photos == p_i).
+      3. Semi-hard negatives: negatives where sim(q, neg) > sim(q, pos) - margin.
+         These are "almost positive" — forcing the model to learn fine-grained
+         distinctions rather than trivially separated clusters.
+      4. If no semi-hard negative exists, fall back to the hardest overall negative.
+
+    Args:
+        q_batch:    (B, D) query embeddings (normalised)
+        p_batch:    (B, D) positive photo embeddings (normalised) — paired with queries
+        all_photos: (N, D) the full photo gallery (normalised)
+        margin:     triplet margin
+
+    Returns:
+        hard_neg_photos: (B, D) — one hard negative per query
+    """
+    B = q_batch.shape[0]
+    N = all_photos.shape[0]
+
+    # Similarity of each query to ALL gallery photos: (B, N)
+    sim_all = torch.mm(q_batch, all_photos.t())          # (B, N)
+
+    # Similarity of each query to its POSITIVE photo: (B,)
+    pos_sim = (q_batch * p_batch).sum(dim=-1)            # (B,)
+
+    # Identify positive indices in all_photos for each batch item
+    # (using cosine similarity threshold — photos are normalised, so exact match ≈ 1.0)
+    # We mask off the true positive from the negative candidates.
+    pos_sims_vs_gallery = torch.mm(p_batch, all_photos.t())  # (B, N)
+    is_positive_mask = (pos_sims_vs_gallery > 0.999)         # (B, N) True = positive
+
+    hard_negs = []
+    for i in range(B):
+        row = sim_all[i]                       # (N,) similarity of query i to all photos
+        pos_s = pos_sim[i]                     # scalar: similarity to ground-truth
+
+        # Mask: not a positive photo AND sim > pos_sim - margin (semi-hard condition)
+        semi_hard_mask = (~is_positive_mask[i]) & (row > pos_s - margin)
+
+        if semi_hard_mask.any():
+            # Among semi-hard candidates, pick the one closest to positive (hardest)
+            candidate_sims = row.clone()
+            candidate_sims[~semi_hard_mask] = -float('inf')
+            hard_idx = candidate_sims.argmax()
+        else:
+            # No semi-hard found: pick the overall hardest negative (highest sim)
+            all_neg_sims = row.clone()
+            all_neg_sims[is_positive_mask[i]] = -float('inf')
+            hard_idx = all_neg_sims.argmax()
+
+        hard_negs.append(all_photos[hard_idx])
+
+    return torch.stack(hard_negs, dim=0)    # (B, D)
+
+
 def pretrain(queries, photos, combiner, device, epochs=EPOCHS, lr=LR):
     """
-    Trains combiner using triplet margin loss.
+    Trains combiner using triplet margin loss with semi-hard negative mining.
 
     For each item i in a batch:
-      - positive: (query[i], photo[i])   -- ground-truth match
-      - negatives: (query[i], photo[j])  for j != i (in-batch negatives via roll)
+      - positive: (query[i], photos[i])   — ground-truth match
+      - negative: mine_semi_hard_negatives() — hardest non-matching photo
+                  from the FULL gallery (not just the current mini-batch)
+
+    Why semi-hard?
+      Random roll (old approach) trivially separates same-batch negatives that
+      are already far apart in embedding space → triplet loss saturates at 0.26
+      with margin trivially satisfied.
+      Semi-hard negatives are "almost positive" → the model must learn to
+      distinguish genuinely ambiguous cases.
     """
     optimizer = torch.optim.AdamW(combiner.parameters(), lr=lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
     N = queries.shape[0]
     best_loss = float('inf')
+
+    # Pre-normalise the entire gallery (used for semi-hard mining)
+    gallery_photos = F.normalize(photos, dim=-1).to(device)
 
     for epoch in range(1, epochs + 1):
         combiner.train()
@@ -102,18 +178,22 @@ def pretrain(queries, photos, combiner, device, epochs=EPOCHS, lr=LR):
 
         for start in range(0, N, BATCH_SIZE):
             end = min(start + BATCH_SIZE, N)
-            q_batch = queries_shuffled[start:end].to(device)
-            p_batch = photos_shuffled[start:end].to(device)
+            q_batch = F.normalize(queries_shuffled[start:end], dim=-1).to(device)
+            p_batch = F.normalize(photos_shuffled[start:end], dim=-1).to(device)
             B = q_batch.shape[0]
             if B < 2:
                 continue
 
             optimizer.zero_grad()
 
+            # Positive scores
             pos_scores = combiner(q_batch, p_batch).squeeze(-1)
 
-            shift = torch.randint(1, B, (1,)).item()
-            neg_photos = torch.roll(p_batch, shifts=shift, dims=0)
+            # Semi-hard negatives mined from FULL gallery
+            with torch.no_grad():
+                neg_photos = mine_semi_hard_negatives(
+                    q_batch, p_batch, gallery_photos, margin=TRIPLET_MARGIN
+                )
             neg_scores = combiner(q_batch, neg_photos).squeeze(-1)
 
             loss = F.relu(TRIPLET_MARGIN - pos_scores + neg_scores).mean()
@@ -139,9 +219,11 @@ def pretrain(queries, photos, combiner, device, epochs=EPOCHS, lr=LR):
                 {'epoch': epoch, 'loss': avg_loss, 'state_dict': combiner.state_dict()},
                 OUTPUT_PATH
             )
-            print(f"[CombinerPretrain] New best saved -> {OUTPUT_PATH}")
+            print(f"[CombinerPretrain] New best saved → {OUTPUT_PATH}")
 
     return best_loss
+
+
 
 
 def main():

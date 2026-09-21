@@ -62,6 +62,8 @@ def train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device, e
         )
         scaler.step(optimizer)
         scaler.update()
+        # Component 1 (MoCo): EMA update of momentum encoder after every optimizer step
+        model.momentum_update()
         scheduler.step()
 
         total_loss += loss.item()
@@ -164,6 +166,7 @@ def main():
 
     trainable_params = [p for p in model.parameters() if p.requires_grad]
     print(f"[Model] Trainable params: {sum(p.numel() for p in trainable_params):,}")
+    print(f"[Model] MoCo queue size: {model.moco_queue.queue_size:,} negatives")
 
     # --- Optimizer ---
     optimizer = torch.optim.AdamW(trainable_params, lr=args.lr, weight_decay=1e-4)

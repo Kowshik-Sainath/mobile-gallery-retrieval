@@ -138,20 +138,36 @@ def load_mobileclip_backbone(
 
 def apply_sketch_lora(
     model,
-    r: int = 8,
-    lora_alpha: int = 16,
-    lora_dropout: float = 0.1,
+    r_linear: int = 16,
+    r_conv: int = 4,
+    lora_alpha_linear: int = 32,
+    lora_alpha_conv: int = 8,
+    lora_dropout: float = 0.05,
     adapter_name: str = "sketch"
 ):
     """
-    Attaches a named PEFT LoRA adapter ('sketch') to the vision encoder.
+    Two-Tier LoRA for MobileCLIP-S1 (FastViT backbone):
 
-    FIX A: Detects actual Linear modules in the vision encoder by iterating
-    named_modules() and checking isinstance(module, nn.Linear) — no substring
-    guessing. Asserts at least one target is matched before attaching.
+    Tier 1 — Attention layers (network.7):
+        Target: qkv Linear modules.
+        Rank r=16, alpha=32. These layers handle semantic cross-modal attention.
 
-    For MobileCLIP-S1 (FastViT): the MHSA AttentionBlocks in model.network.7
-    contain Linear layers (qkv, proj) — these are the correct LoRA targets.
+    Tier 2 — RepMixer convolutional stages (network.1–6):
+        Target: reparam_conv Conv2d modules (1×1 MobileOneBlock convs).
+        Rank r=4, alpha=8. These layers handle spatial edge-detection filters
+        critical for freehand sketch domain adaptation.
+
+    Design:
+        Uses a SINGLE LoraConfig with rank_pattern / lora_alpha_pattern to
+        assign different ranks per-module type, avoiding the need for two
+        separate PEFT adapter attachment calls (which would require two
+        get_peft_model calls and complex adapter merging).
+
+    Safety:
+        - Only leaf names exclusively mapping to nn.Linear are used for Tier 1.
+        - Only leaf names exclusively mapping to nn.Conv2d are used for Tier 2.
+        - Name collisions (leaf appears as both Linear and Sequential/Conv2d)
+          are excluded — same logic as the original fix for 'proj' bug.
     """
     if not PEFT_AVAILABLE:
         raise ImportError(
@@ -167,12 +183,9 @@ def apply_sketch_lora(
             "Expected attribute 'image_encoder' or 'visual'."
         )
 
-    # FIX A — Collect a mapping of leaf_name → set of all module types with that name.
-    # PEFT target_modules matches by leaf name substring across the WHOLE model tree.
-    # If a leaf name like 'proj' is shared by both nn.Linear AND nn.Sequential,
-    # PEFT will attempt to wrap the Sequential too and crash.
-    # Solution: only use leaf names that are *exclusively* nn.Linear everywhere.
+    # --- Build leaf_name → {set of module types} map ---
     from collections import defaultdict
+    from dataclasses import fields as dc_fields
     leaf_to_types: dict[str, set] = defaultdict(set)
     for full_name, module in img_enc.named_modules():
         if not full_name:
@@ -180,83 +193,136 @@ def apply_sketch_lora(
         leaf = full_name.split('.')[-1]
         leaf_to_types[leaf].add(type(module))
 
-    # Leaf names where every module with that name is nn.Linear — no collisions
+    # --- Tier 1: collision-free Linear-only leaf names ---
     safe_linear_leaves = {
         leaf for leaf, types in leaf_to_types.items()
         if types == {nn.Linear}
     }
+    preferred_linear = {'qkv', 'proj', 'out_proj', 'in_proj', 'fc1', 'fc2',
+                        'q_proj', 'k_proj', 'v_proj'}
+    linear_targets = sorted(safe_linear_leaves & preferred_linear)
+    if not linear_targets:
+        linear_targets = sorted(safe_linear_leaves)
 
-    # Prefer canonical attention projection names from the safe set
-    preferred = {'qkv', 'proj', 'out_proj', 'in_proj', 'fc1', 'fc2', 'q_proj', 'k_proj', 'v_proj'}
-    found_targets = list(safe_linear_leaves & preferred)
-
-    if not found_targets:
-        # Second pass: try all safe linear leaves
-        found_targets = list(safe_linear_leaves)
-
-    if not found_targets:
-        # Last resort: list all unique Linear leaf names (may have collisions, but is better
-        # than failing entirely). PEFT will raise a clear error if this happens.
-        all_linear_leaves = set()
-        for full_name, module in img_enc.named_modules():
-            if isinstance(module, nn.Linear):
-                all_linear_leaves.add(full_name.split('.')[-1])
-        found_targets = list(all_linear_leaves)
-        print(
-            f"[LoRA] Warning: no collision-free leaf names found. "
-            f"Using all Linear leaves (may hit PEFT errors): {sorted(found_targets)}"
-        )
-
-    assert len(found_targets) > 0, (
-        f"apply_sketch_lora: No Linear modules found in {type(img_enc).__name__}. "
-        "Cannot attach LoRA adapter."
-    )
-
-    # Log which leaf names are safe and which were excluded due to type collisions
-    excluded = {
+    # --- Tier 2: collision-free Conv2d-only leaf names ---
+    safe_conv2d_leaves = {
         leaf for leaf, types in leaf_to_types.items()
-        if isinstance(list(types)[0], type) and nn.Linear in types and len(types) > 1
+        if types == {nn.Conv2d}
     }
-    if excluded:
-        print(f"[LoRA] Excluded ambiguous leaf names (shared with non-Linear modules): {sorted(excluded)}")
-    print(f"[LoRA] Attaching '{adapter_name}' adapter to modules: {sorted(found_targets)}")
+    # reparam_conv: 1×1 MobileOneBlock conv in RepMixer stages — best LoRA candidate.
+    # Exclude conv_exp (hooked for patch tokens) and depthwise convs.
+    preferred_conv = {'reparam_conv'}
+    conv_targets = sorted(safe_conv2d_leaves & preferred_conv)
 
-    config = LoraConfig(
-        r=r,
-        lora_alpha=lora_alpha,
-        target_modules=found_targets,
-        lora_dropout=lora_dropout,
-        bias="none"
+    all_targets = linear_targets + conv_targets
+    assert len(all_targets) > 0, (
+        f"apply_sketch_lora: No safe LoRA targets found in {type(img_enc).__name__}."
     )
+
+    # --- Log exclusions ---
+    ambiguous_linear = {
+        leaf for leaf, types in leaf_to_types.items()
+        if nn.Linear in types and len(types) > 1
+    }
+    if ambiguous_linear:
+        print(f"[LoRA] Excluded ambiguous Linear leaves: {sorted(ambiguous_linear)}")
+
+    ambiguous_conv = {
+        leaf for leaf, types in leaf_to_types.items()
+        if nn.Conv2d in types and len(types) > 1
+    }
+    if ambiguous_conv:
+        print(f"[LoRA] Excluded ambiguous Conv2d leaves: {sorted(ambiguous_conv)}")
+
+    print(
+        f"[LoRA] Two-tier targeting:\n"
+        f"  Tier 1 Linear  (r={r_linear}): {linear_targets}\n"
+        f"  Tier 2 Conv2d  (r={r_conv}):   {conv_targets}"
+    )
+
+    # --- Build rank_pattern for per-module rank overrides ---
+    # rank_pattern keys are regex patterns matched against the full module path.
+    # '.*<leaf_name>' matches any path ending with that leaf name.
+    rank_pattern = {}
+    alpha_pattern = {}
+    for leaf in conv_targets:
+        pattern = f'.*{leaf}'
+        rank_pattern[pattern] = r_conv
+        alpha_pattern[pattern] = lora_alpha_conv
+
+    # Check whether this PEFT version supports rank_pattern
+    peft_config_fields = {f.name for f in dc_fields(LoraConfig)}
+    use_rank_pattern = 'rank_pattern' in peft_config_fields and bool(conv_targets)
+
+    if use_rank_pattern:
+        config = LoraConfig(
+            r=r_linear,                    # default rank for Linear tiers
+            lora_alpha=lora_alpha_linear,
+            target_modules=all_targets,
+            rank_pattern=rank_pattern,          # override Conv2d layers to r_conv
+            alpha_pattern=alpha_pattern,        # PEFT API: alpha_pattern (not lora_alpha_pattern)
+            lora_dropout=lora_dropout,
+            bias="none",
+        )
+        print(f"[LoRA] Using rank_pattern for per-tier rank assignment.")
+
+    else:
+        # Fallback: single rank for all targets (older PEFT without rank_pattern)
+        print(
+            f"[LoRA] rank_pattern not supported by this PEFT version. "
+            f"Falling back to single rank r={r_linear} for all targets."
+        )
+        config = LoraConfig(
+            r=r_linear,
+            lora_alpha=lora_alpha_linear,
+            target_modules=all_targets,
+            lora_dropout=lora_dropout,
+            bias="none",
+        )
 
     try:
         model.image_encoder = get_peft_model(img_enc, config, adapter_name=adapter_name)
     except Exception as e:
-        # Re-raise: silent fallback is not allowed here
-        raise RuntimeError(
-            f"PEFT get_peft_model failed for adapter '{adapter_name}': {e}"
-        ) from e
+        if conv_targets:
+            print(
+                f"[LoRA] Two-tier attach failed ({e}). "
+                f"Retrying with Linear-only targets (Tier 1 only)."
+            )
+            config_fallback = LoraConfig(
+                r=r_linear,
+                lora_alpha=lora_alpha_linear,
+                target_modules=linear_targets,
+                lora_dropout=lora_dropout,
+                bias="none",
+            )
+            model.image_encoder = get_peft_model(img_enc, config_fallback, adapter_name=adapter_name)
+        else:
+            raise RuntimeError(
+                f"PEFT get_peft_model failed for adapter '{adapter_name}': {e}"
+            ) from e
 
-    # Verify attachment: count lora_ prefixed parameters
-    lora_params = [
-        n for n, _ in model.image_encoder.named_parameters()
-        if 'lora_' in n
-    ]
-    assert len(lora_params) > 0, (
-        "apply_sketch_lora: get_peft_model ran without error, "
-        "but no 'lora_' parameters found. LoRA was not attached."
-    )
-    trainable = sum(
+    # Verify: count LoRA params per tier
+    lora_linear_params = sum(
         p.numel() for n, p in model.image_encoder.named_parameters()
-        if 'lora_' in n
+        if 'lora_' in n and any(t in n for t in linear_targets)
+    )
+    lora_conv_params = sum(
+        p.numel() for n, p in model.image_encoder.named_parameters()
+        if 'lora_' in n and any(t in n for t in conv_targets)
+    )
+    total_lora = lora_linear_params + lora_conv_params
+    assert total_lora > 0, (
+        "apply_sketch_lora: no 'lora_' parameters found after attachment."
     )
     print(
-        f"[LoRA] '{adapter_name}' attached successfully | "
-        f"LoRA parameter tensors: {len(lora_params)} | "
-        f"Trainable LoRA params: {trainable:,}"
+        f"[LoRA] '{adapter_name}' attached | "
+        f"Linear LoRA params: {lora_linear_params:,} | "
+        f"Conv2d LoRA params: {lora_conv_params:,} | "
+        f"Total trainable: {total_lora:,}"
     )
 
     return model
+
 
 
 # ---------------------------------------------------------------------------
