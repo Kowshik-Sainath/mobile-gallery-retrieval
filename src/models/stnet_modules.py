@@ -26,15 +26,15 @@ class SketchGuidedAttentionPooling(nn.Module):
         """
         Args:
             sketch_embed: Tensor of shape (B, D)
-            patch_embeds: Tensor of shape (B, N, D)
+            patch_embeds: Tensor of shape (B, N, D) with N > 1
         Returns:
             attended_photo_embed: Tensor of shape (B, D)
         """
         if patch_embeds.dim() == 2:
-            # If patch_embeds is (B, D), treat as single token sequence
             patch_embeds = patch_embeds.unsqueeze(1)
 
         B, N, D = patch_embeds.shape
+        assert N > 1, f"SketchGuidedAttentionPooling requires multi-token patch sequence N > 1, but got N = {N}."
         
         # Q: (B, 1, D)
         q = self.q_proj(sketch_embed).unsqueeze(1)

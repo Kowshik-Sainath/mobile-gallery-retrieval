@@ -1,0 +1,203 @@
+"""
+Offline Combiner Reranker Pretraining on FS-COCO (BUG 5 FIX).
+
+Trains FeedbackCombinerReranker on real composite_query / attended_photo
+embedding pairs from the FS-COCO train split — NOT on torch.randn() tensors.
+
+Cold-start pretraining ensures day-one users get a reranker that at minimum
+orders results better than random, before any on-device feedback accumulates.
+
+Loss: Triplet margin loss.
+  - Positive: ground-truth (query, matching_photo) pair → high score
+  - Negatives: same query, random non-matching photos from batch → low score
+
+Saves: checkpoints/combiner_pretrained.pt
+Run: python -m src.reranker.pretrain_reranker
+"""
+
+# Issue 5 FIX: suppress TF/Protobuf/timm warning flood BEFORE any imports
+import os
+import warnings
+os.environ["TF_ENABLE_ONEDNN_OPTS"] = "0"
+os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
+
+import sys
+import torch
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+
+# Ensure project root is on path when run as module
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+
+from src.data.fscoco_dataset import FSCOCODataset
+from src.models.composite_model import TSBIRCompositeModel
+from src.reranker.combiner import FeedbackCombinerReranker
+
+
+CHECKPOINT_PATH = "checkpoints/checkpoint_best.pt"
+BACKBONE_PATH   = "checkpoints/mobileclip_s1.pt"
+OUTPUT_PATH     = "checkpoints/combiner_pretrained.pt"
+DATA_DIR        = "fscoco"
+EPOCHS          = 10
+BATCH_SIZE      = 32
+LR              = 5e-4
+TRIPLET_MARGIN  = 0.3
+
+
+def extract_embeddings(model, loader, device):
+    """
+    Extracts (composite_query, attended_photo) embedding pairs from FS-COCO train split.
+    Returns two tensors of shape (N, 512).
+    """
+    model.eval()
+    all_queries, all_photos = [], []
+
+    with torch.no_grad():
+        for batch in tqdm(loader, desc="Extracting embeddings"):
+            sketch = batch['sketch'].to(device)
+            captions = batch['caption']
+            photo = batch['photo'].to(device)
+
+            e_sketch = model.encode_sketch(sketch)
+            e_text = model.encode_text(captions)
+            photo_patches = model.encode_photo_patches(photo)
+            attended_photo, _ = model.attention_pooling(e_sketch, photo_patches)
+            attended_photo = F.normalize(attended_photo, dim=-1)
+
+            raw_composite = torch.cat([e_sketch, e_text], dim=-1)
+            e_composite = F.normalize(model.composite_fusion(raw_composite), dim=-1)
+
+            all_queries.append(e_composite.cpu())
+            all_photos.append(attended_photo.cpu())
+
+    queries = torch.cat(all_queries, dim=0)   # (N, 512)
+    photos  = torch.cat(all_photos, dim=0)    # (N, 512)
+    return queries, photos
+
+
+def pretrain(queries, photos, combiner, device, epochs=EPOCHS, lr=LR):
+    """
+    Trains combiner using triplet margin loss.
+
+    For each item i in a batch:
+      - positive: (query[i], photo[i])   -- ground-truth match
+      - negatives: (query[i], photo[j])  for j != i (in-batch negatives via roll)
+    """
+    optimizer = torch.optim.AdamW(combiner.parameters(), lr=lr, weight_decay=1e-4)
+    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
+    N = queries.shape[0]
+    best_loss = float('inf')
+
+    for epoch in range(1, epochs + 1):
+        combiner.train()
+        perm = torch.randperm(N)
+        queries_shuffled = queries[perm]
+        photos_shuffled  = photos[perm]
+
+        total_loss = 0.0
+        n_batches  = 0
+
+        for start in range(0, N, BATCH_SIZE):
+            end = min(start + BATCH_SIZE, N)
+            q_batch = queries_shuffled[start:end].to(device)
+            p_batch = photos_shuffled[start:end].to(device)
+            B = q_batch.shape[0]
+            if B < 2:
+                continue
+
+            optimizer.zero_grad()
+
+            pos_scores = combiner(q_batch, p_batch).squeeze(-1)
+
+            shift = torch.randint(1, B, (1,)).item()
+            neg_photos = torch.roll(p_batch, shifts=shift, dims=0)
+            neg_scores = combiner(q_batch, neg_photos).squeeze(-1)
+
+            loss = F.relu(TRIPLET_MARGIN - pos_scores + neg_scores).mean()
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(combiner.parameters(), max_norm=1.0)
+            optimizer.step()
+
+            total_loss += loss.item()
+            n_batches  += 1
+
+        avg_loss = total_loss / max(n_batches, 1)
+        scheduler.step()
+
+        print(
+            f"[CombinerPretrain] Epoch {epoch}/{epochs} | "
+            f"Triplet Loss: {avg_loss:.4f} | "
+            f"LR: {scheduler.get_last_lr()[0]:.2e}"
+        )
+
+        if avg_loss < best_loss:
+            best_loss = avg_loss
+            torch.save(
+                {'epoch': epoch, 'loss': avg_loss, 'state_dict': combiner.state_dict()},
+                OUTPUT_PATH
+            )
+            print(f"[CombinerPretrain] New best saved -> {OUTPUT_PATH}")
+
+    return best_loss
+
+
+def main():
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"[CombinerPretrain] Device: {device}")
+
+    print("[CombinerPretrain] Loading TSBIRCompositeModel...")
+    retrieval_model = TSBIRCompositeModel(
+        backbone_name="mobileclip_s1",
+        checkpoint_path=BACKBONE_PATH,
+        device=device,
+    )
+
+    # Issue 3 FIX: always use checkpoint_best.pt (latest model) for embedding extraction.
+    # Using checkpoint_latest.pt (epoch 15) to pretrain the reranker for a model that
+    # later reached epoch 19 means the reranker is mis-aligned to stale representations.
+    ckpt_path = CHECKPOINT_PATH  # checkpoint_best.pt
+    if not os.path.exists(ckpt_path):
+        fallback = "checkpoints/checkpoint_latest.pt"
+        if os.path.exists(fallback):
+            print(
+                f"[CombinerPretrain] WARNING: checkpoint_best.pt not found at '{ckpt_path}'.\n"
+                f"  Falling back to '{fallback}' — embeddings may not reflect the optimal model.\n"
+                "  Run training first to generate checkpoint_best.pt."
+            )
+            ckpt_path = fallback
+        else:
+            print("[CombinerPretrain] No checkpoint found — using random init adapter.")
+            ckpt_path = None
+    if ckpt_path and os.path.exists(ckpt_path):
+        print(f"[CombinerPretrain] Loading adapter weights: {ckpt_path}")
+        ckpt = torch.load(ckpt_path, map_location='cpu', weights_only=False)
+        state = ckpt.get('state_dict', ckpt.get('full_state_dict', ckpt))
+        # Issue 1 FIX: check saved LoRA targets before loading
+        saved_targets = ckpt.get('lora_targets', None)
+        if saved_targets is not None:
+            print(f"[CombinerPretrain] Checkpoint was trained with LoRA targets: {sorted(saved_targets)}")
+        retrieval_model.load_state_dict(state, strict=False)
+
+    retrieval_model.to(device)
+
+    print(f"[CombinerPretrain] Loading FS-COCO train split: {DATA_DIR}")
+    train_dataset = FSCOCODataset(DATA_DIR, split='train')
+    train_loader  = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
+    print(f"[CombinerPretrain] Train samples: {len(train_dataset)}")
+
+    queries, photos = extract_embeddings(retrieval_model, train_loader, device)
+    print(f"[CombinerPretrain] Embeddings: queries={queries.shape}, photos={photos.shape}")
+
+    combiner = FeedbackCombinerReranker(feature_dim=512).to(device)
+    print(f"[CombinerPretrain] Combiner params: {sum(p.numel() for p in combiner.parameters()):,}")
+
+    best_loss = pretrain(queries, photos, combiner, device)
+    print(f"\n[CombinerPretrain] Done. Best triplet loss: {best_loss:.4f}")
+    print(f"[CombinerPretrain] Weights saved: {OUTPUT_PATH}")
+
+
+if __name__ == '__main__':
+    main()

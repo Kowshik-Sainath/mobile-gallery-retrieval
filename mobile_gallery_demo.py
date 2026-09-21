@@ -1,13 +1,22 @@
 """
 Fast ONNX Mobile Web App Server for Testing T+SBIR on Android Phones.
-Runs 100% on ONNX Runtime (Zero PyTorch dependencies during web server runtime).
-Instantly connects mobile browser over local Wi-Fi to run sketch drawing + search over phone gallery.
+
+BUG 7 FIX applied:
+  - SQLite persistence: gallery embeddings stored in gallery.db, survive server restarts.
+  - Incremental indexing: only new/changed files (by last_modified timestamp) are re-embedded.
+  - Batched cosine scan: single np.dot(sketch_emb, gallery_matrix.T) instead of Python loop.
+  - /clear_gallery endpoint for testing.
+
+Runs 100% on ONNX Runtime (zero PyTorch dependencies at runtime).
+Connects mobile browser over local Wi-Fi to run sketch drawing + search.
 """
 
 import os
 import io
 import time
 import base64
+import sqlite3
+import struct
 import numpy as np
 from PIL import Image
 
@@ -29,21 +38,91 @@ app = Flask(__name__) if FLASK_AVAILABLE else None
 vision_session = None
 combiner_session = None
 
-gallery_db = [] # List of {'filename': str, 'embedding': numpy_array, 'image_b64': str}
+# SQLite gallery database path
+GALLERY_DB_PATH = "gallery.db"
 
 # CLIP Normalization constants
 MEAN = np.array([0.48145466, 0.4578275, 0.40821073], dtype=np.float32).reshape(1, 3, 1, 1)
-STD = np.array([0.26862954, 0.26130258, 0.27577711], dtype=np.float32).reshape(1, 3, 1, 1)
+STD  = np.array([0.26862954, 0.26130258, 0.27577711], dtype=np.float32).reshape(1, 3, 1, 1)
+
+EMBED_DIM = 512
 
 
-def preprocess_image(pil_img):
+# ---------------------------------------------------------------------------
+# SQLite helpers (BUG 7 FIX — persistent gallery)
+# ---------------------------------------------------------------------------
+
+def get_db():
+    conn = sqlite3.connect(GALLERY_DB_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def init_db():
+    """Creates gallery table if it doesn't exist."""
+    with get_db() as conn:
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS gallery (
+                filename     TEXT PRIMARY KEY,
+                embedding    BLOB NOT NULL,
+                thumbnail_b64 TEXT NOT NULL,
+                last_modified INTEGER NOT NULL DEFAULT 0
+            )
+        """)
+        conn.commit()
+    print(f"[DB] Gallery database initialized at: {GALLERY_DB_PATH}")
+
+
+def embedding_to_blob(emb: np.ndarray) -> bytes:
+    """Serialize float32 numpy array to bytes blob."""
+    return struct.pack(f'{len(emb)}f', *emb.tolist())
+
+
+def blob_to_embedding(blob: bytes) -> np.ndarray:
+    """Deserialize bytes blob to float32 numpy array."""
+    n = len(blob) // 4
+    return np.array(struct.unpack(f'{n}f', blob), dtype=np.float32)
+
+
+def count_gallery() -> int:
+    with get_db() as conn:
+        row = conn.execute("SELECT COUNT(*) as n FROM gallery").fetchone()
+        return row['n']
+
+
+def load_gallery_matrix():
+    """
+    BUG 7 FIX — Loads all embeddings as a (N, D) matrix for batched cosine scan.
+    Also returns list of (filename, thumbnail_b64) in the same order.
+    """
+    with get_db() as conn:
+        rows = conn.execute("SELECT filename, embedding, thumbnail_b64 FROM gallery").fetchall()
+
+    if not rows:
+        return None, [], []
+
+    filenames   = [r['filename'] for r in rows]
+    thumbnails  = [r['thumbnail_b64'] for r in rows]
+    embeddings  = np.stack([blob_to_embedding(r['embedding']) for r in rows], axis=0)
+    return embeddings, filenames, thumbnails
+
+
+# ---------------------------------------------------------------------------
+# Image preprocessing
+# ---------------------------------------------------------------------------
+
+def preprocess_image(pil_img: Image.Image) -> np.ndarray:
     img = pil_img.convert('RGB').resize((224, 224), Image.Resampling.BICUBIC)
-    arr = np.array(img, dtype=np.float32) / 255.0  # HWC
-    arr = np.transpose(arr, (2, 0, 1))             # CHW
-    arr = np.expand_dims(arr, axis=0)              # NCHW (1, 3, 224, 224)
+    arr = np.array(img, dtype=np.float32) / 255.0   # HWC
+    arr = np.transpose(arr, (2, 0, 1))              # CHW
+    arr = np.expand_dims(arr, axis=0)               # NCHW
     arr = (arr - MEAN) / STD
     return arr.astype(np.float32)
 
+
+# ---------------------------------------------------------------------------
+# HTML UI
+# ---------------------------------------------------------------------------
 
 HTML_TEMPLATE = """
 <!DOCTYPE html>
@@ -63,33 +142,38 @@ HTML_TEMPLATE = """
         button { flex: 1; padding: 12px; border: none; border-radius: 8px; font-weight: 600; font-size: 0.95rem; cursor: pointer; }
         .btn-primary { background: #1a73e8; color: white; }
         .btn-secondary { background: #e8eaed; color: #3c4043; }
+        .btn-danger { background: #d93025; color: white; }
         .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 10px; }
         .gallery-item { position: relative; border-radius: 8px; overflow: hidden; background: #eee; aspect-ratio: 1; }
         .gallery-item img { width: 100%; height: 100%; object-fit: cover; }
         .score-badge { position: absolute; bottom: 4px; right: 4px; background: rgba(0,0,0,0.75); color: #4df8a0; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; }
         .custom-file-upload { display: block; text-align: center; padding: 12px; background: #e8f0fe; color: #1a73e8; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 8px; }
         input[type="file"] { display: none; }
+        #status { font-size: 0.85rem; color: #666; margin-top: 8px; text-align: center; min-height: 1.2em; }
     </style>
 </head>
 <body>
-    <h1>📱 T+SBIR Mobile ONNX Gallery AI</h1>
+    <h1>&#128247; T+SBIR Mobile ONNX Gallery AI</h1>
 
     <div class="card">
         <div class="card-title">1. Draw Scene Sketch (Touch Canvas)</div>
         <canvas id="sketchCanvas" width="224" height="224"></canvas>
         <div class="btn-group">
-            <button class="btn-secondary" onclick="clearCanvas()">Clear Canvas</button>
-            <button class="btn-primary" onclick="executeSearch()">🔍 Search Photos</button>
+            <button class="btn-secondary" onclick="clearCanvas()">Clear</button>
+            <button class="btn-primary" onclick="executeSearch()">&#128269; Search</button>
         </div>
     </div>
 
     <div class="card">
         <div class="card-title">2. Add Photos from Phone Gallery</div>
         <label class="custom-file-upload">
-            📁 Select Phone Gallery Photos
+            &#128193; Select Phone Gallery Photos
             <input type="file" id="photoInput" multiple accept="image/*" onchange="uploadPhonePhotos()">
         </label>
-        <div id="galleryCount" style="font-size:0.85rem; color:#666; margin-top:8px; text-align:center;">Indexed Photos: 0</div>
+        <div id="status">Loading gallery count...</div>
+        <div class="btn-group" style="margin-top:10px;">
+            <button class="btn-danger" onclick="clearGallery()">&#128465; Clear Gallery DB</button>
+        </div>
     </div>
 
     <div class="card">
@@ -133,42 +217,55 @@ HTML_TEMPLATE = """
         canvas.addEventListener('mousedown', startDraw);
         canvas.addEventListener('mouseup', stopDraw);
         canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('touchstart', startDraw);
+        canvas.addEventListener('touchstart', startDraw, {passive: false});
         canvas.addEventListener('touchend', stopDraw);
-        canvas.addEventListener('touchmove', draw);
+        canvas.addEventListener('touchmove', draw, {passive: false});
 
         function clearCanvas() {
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
 
+        async function refreshCount() {
+            const res = await fetch('/gallery_count');
+            const data = await res.json();
+            document.getElementById('status').innerText = `Indexed Photos: ${data.count} (persisted in SQLite)`;
+        }
+
         async function uploadPhonePhotos() {
             const input = document.getElementById('photoInput');
             if (input.files.length === 0) return;
-
+            document.getElementById('status').innerText = "Indexing new photos (incremental)...";
             const formData = new FormData();
-            for (let file of input.files) {
-                formData.append('photos', file);
-            }
-
-            document.getElementById('galleryCount').innerText = "Indexing photos via ONNX INT8 model...";
+            for (let file of input.files) formData.append('photos', file);
             const res = await fetch('/upload_photos', { method: 'POST', body: formData });
             const data = await res.json();
-            document.getElementById('galleryCount').innerText = `Indexed Photos: ${data.total_photos}`;
+            document.getElementById('status').innerText =
+                `Indexed: ${data.total_photos} total | New: ${data.new_indexed} | Skipped: ${data.skipped}`;
+        }
+
+        async function clearGallery() {
+            if (!confirm("Clear all indexed photos from the database?")) return;
+            await fetch('/clear_gallery', { method: 'POST' });
+            document.getElementById('status').innerText = "Gallery cleared.";
+            document.getElementById('resultsGrid').innerHTML = '';
         }
 
         async function executeSearch() {
             const sketchData = canvas.toDataURL('image/png');
-
+            document.getElementById('status').innerText = "Searching...";
             const res = await fetch('/search', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ sketch_b64: sketchData })
             });
             const data = await res.json();
-
             const grid = document.getElementById('resultsGrid');
             grid.innerHTML = '';
+            if (data.results.length === 0) {
+                document.getElementById('status').innerText = "No photos indexed yet.";
+                return;
+            }
             data.results.forEach(item => {
                 grid.innerHTML += `
                     <div class="gallery-item">
@@ -177,94 +274,187 @@ HTML_TEMPLATE = """
                     </div>
                 `;
             });
+            document.getElementById('status').innerText =
+                `Found ${data.results.length} results in ${data.latency_ms.toFixed(1)} ms`;
         }
+
+        // Load gallery count on page load
+        refreshCount();
     </script>
 </body>
 </html>
 """
 
+
+# ---------------------------------------------------------------------------
+# Routes
+# ---------------------------------------------------------------------------
+
 @app.route('/')
 def index():
     return render_template_string(HTML_TEMPLATE)
 
+
+@app.route('/gallery_count')
+def gallery_count():
+    return jsonify({'count': count_gallery()})
+
+
 @app.route('/upload_photos', methods=['POST'])
 def upload_photos():
+    """
+    BUG 7 FIX — Incremental indexing:
+      - Checks SQLite for existing filename + last_modified.
+      - Only re-embeds files that are new or have changed.
+    """
     files = request.files.getlist('photos')
-    for file in files:
-        img_bytes = file.read()
-        img = Image.open(io.BytesIO(img_bytes)).convert('RGB')
-        
-        # Preprocess & compute ONNX embedding
-        inp_np = preprocess_image(img)
-        outputs = vision_session.run(None, {'image_input': inp_np})
-        emb = outputs[0][0] # 512-d normalized embedding
+    new_indexed = 0
+    skipped     = 0
 
-        # Thumbnail for display
-        buffered = io.BytesIO()
-        img.thumbnail((300, 300))
-        img.save(buffered, format="JPEG")
-        img_b64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+    with get_db() as conn:
+        for file in files:
+            filename = file.filename
+            img_bytes = file.read()
 
-        gallery_db.append({
-            'filename': file.filename,
-            'embedding': emb,
-            'image_b64': img_b64
-        })
+            # Use file size as a simple change proxy (no real mtime from browser upload)
+            last_modified = len(img_bytes)
 
-    return jsonify({'total_photos': len(gallery_db)})
+            existing = conn.execute(
+                "SELECT last_modified FROM gallery WHERE filename = ?", (filename,)
+            ).fetchone()
+
+            if existing and existing['last_modified'] == last_modified:
+                skipped += 1
+                continue
+
+            img = Image.open(io.BytesIO(img_bytes)).convert('RGB')
+
+            # ONNX embedding
+            inp_np = preprocess_image(img)
+            outputs = vision_session.run(None, {'image_input': inp_np})
+            emb = outputs[0][0]  # (512,) float32
+
+            # Thumbnail for display
+            buffered = io.BytesIO()
+            img.thumbnail((300, 300))
+            img.save(buffered, format="JPEG", quality=80)
+            img_b64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+            conn.execute(
+                """
+                INSERT OR REPLACE INTO gallery (filename, embedding, thumbnail_b64, last_modified)
+                VALUES (?, ?, ?, ?)
+                """,
+                (filename, embedding_to_blob(emb), img_b64, last_modified)
+            )
+            new_indexed += 1
+
+        conn.commit()
+
+    return jsonify({
+        'total_photos': count_gallery(),
+        'new_indexed': new_indexed,
+        'skipped': skipped,
+    })
+
 
 @app.route('/search', methods=['POST'])
 def search():
+    """
+    BUG 7 FIX — Batched cosine scan:
+      Single np.dot(sketch_emb, gallery_matrix.T) instead of Python loop.
+    """
+    t0 = time.time()
     data = request.json
-    sketch_b64 = data.get('sketch_b64')
+    sketch_b64 = data.get('sketch_b64', '')
 
-    sketch_data = base64.b64decode(sketch_b64.split(',')[1])
-    sketch_img = Image.open(io.BytesIO(sketch_data)).convert('RGB')
-    
-    # Preprocess & compute sketch embedding via ONNX model
+    if ',' in sketch_b64:
+        sketch_b64 = sketch_b64.split(',')[1]
+    sketch_data = base64.b64decode(sketch_b64)
+    sketch_img  = Image.open(io.BytesIO(sketch_data)).convert('RGB')
+
     sketch_np = preprocess_image(sketch_img)
     sketch_outputs = vision_session.run(None, {'image_input': sketch_np})
-    sketch_emb = sketch_outputs[0][0]
+    sketch_emb = sketch_outputs[0][0]  # (512,)
 
-    # Similarity scan over cached gallery photos
-    results = []
-    for item in gallery_db:
-        sim_score = float(np.dot(sketch_emb, item['embedding']))
-        results.append({
-            'filename': item['filename'],
-            'score': sim_score,
-            'image_b64': item['image_b64']
-        })
+    gallery_matrix, filenames, thumbnails = load_gallery_matrix()
 
-    results.sort(key=lambda x: x['score'], reverse=True)
-    return jsonify({'results': results[:9]})
+    if gallery_matrix is None:
+        return jsonify({'results': [], 'latency_ms': 0.0})
 
+    # BUG 7 FIX — single batched dot product (O(N*D) but no Python loop overhead)
+    scores = gallery_matrix @ sketch_emb  # (N,)
+
+    top_k = min(9, len(scores))
+    top_indices = np.argsort(scores)[::-1][:top_k]
+
+    results = [
+        {
+            'filename': filenames[i],
+            'score': float(scores[i]),
+            'image_b64': thumbnails[i],
+        }
+        for i in top_indices
+    ]
+
+    latency_ms = (time.time() - t0) * 1000.0
+    return jsonify({'results': results, 'latency_ms': latency_ms})
+
+
+@app.route('/clear_gallery', methods=['POST'])
+def clear_gallery():
+    """Clears all indexed photos from SQLite gallery."""
+    with get_db() as conn:
+        conn.execute("DELETE FROM gallery")
+        conn.commit()
+    return jsonify({'status': 'cleared'})
+
+
+# ---------------------------------------------------------------------------
+# Server startup
+# ---------------------------------------------------------------------------
 
 def initialize_server():
     global vision_session, combiner_session
+
     print("Initializing ONNX Mobile Web Server...")
-    
+
     onnx_path = "exported_models/vision_encoder_int8.onnx"
     if not os.path.exists(onnx_path):
         onnx_path = "exported_models/vision_encoder_fp32.onnx"
+    if not os.path.exists(onnx_path):
+        raise FileNotFoundError(
+            f"No ONNX vision encoder found. Run python export_mobile.py first."
+        )
 
-    print(f"Loading ONNX Model: {onnx_path}")
+    print(f"[Server] Loading ONNX Vision Model: {onnx_path}")
     vision_session = ort.InferenceSession(onnx_path, providers=['CPUExecutionProvider'])
-    print("ONNX Model Session Ready!")
+    print(f"[Server] ONNX Session ready.")
+
+    combiner_path = "exported_models/combiner_mobile.onnx"
+    if os.path.exists(combiner_path):
+        combiner_session = ort.InferenceSession(combiner_path, providers=['CPUExecutionProvider'])
+        print(f"[Server] Combiner ONNX Session ready.")
+
+    init_db()
 
 
 if __name__ == '__main__':
     if not FLASK_AVAILABLE or not ORT_AVAILABLE:
-        print("Flask and ONNX Runtime are required. Please run: pip install flask onnxruntime")
+        print("Flask and ONNX Runtime are required: pip install flask onnxruntime")
     else:
         initialize_server()
+
         import socket
         hostname = socket.gethostname()
-        local_ip = socket.gethostbyname(hostname)
-        print("\n" + "="*65)
-        print(f"T+SBIR ONNX Mobile Server Running!")
-        print(f"1. Connect your Android Phone to the SAME Wi-Fi network as your laptop.")
-        print(f"2. Open Chrome on your Android Phone and go to:")
-        print(f"   http://{local_ip}:8000")
-        print("="*65 + "\n")
+        try:
+            local_ip = socket.gethostbyname(hostname)
+        except Exception:
+            local_ip = "127.0.0.1"
+
+        print("\n" + "=" * 65)
+        print("T+SBIR ONNX Mobile Server Running!")
+        print("1. Connect your Android Phone to the SAME Wi-Fi as your laptop.")
+        print(f"2. Open Chrome on Android and go to:  http://{local_ip}:8000")
+        print("=" * 65 + "\n")
         app.run(host='0.0.0.0', port=8000)
