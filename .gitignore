@@ -32,5 +32,4 @@ exported_models/
 *.onnx
 *.bin
 *.safetensors
-
 TASK-former/sketch_jpg/

@@ -63,13 +63,36 @@ class CheckpointManager:
         """
         save_path = os.path.join(self.checkpoint_dir, filename)
 
-        # Collect trainable state dict only
+        # Collect trainable state dict only.
+        # NOTE: register_buffer() tensors have requires_grad=False, so they are NOT
+        # caught by the v.requires_grad check. The MoCo queue and queue_ptr MUST be
+        # explicitly included — without them, the negative bank is re-randomised on
+        # every evaluation / resume, destroying the contrastive state.
+        # The momentum_encoder is intentionally excluded (large frozen copy, always
+        # re-built from the online encoder on load).
+        ALWAYS_SAVE_TAGS = (
+            'lora_',
+            'attention_pooling',
+            'composite_fusion',
+            'sketch_decoder',
+            'text_adapter',
+            'patch_extractor.proj',
+            'moco_queue.queue',        # ← MoCo FIFO buffer (register_buffer, not param)
+            'moco_queue.queue_ptr',    # ← MoCo write pointer  (register_buffer, not param)
+        )
+        NEVER_SAVE_TAGS = (
+            'momentum_encoder.',       # frozen EMA copy (~82 MB) — always rebuilt on load
+        )
+
         trainable_state = {
             k: v
             for k, v in model.state_dict().items()
-            if v.requires_grad or any(
-                tag in k for tag in ('lora_', 'attention_pooling', 'composite_fusion',
-                                     'sketch_decoder', 'text_adapter', 'patch_extractor.proj')
+            if (
+                not any(k.startswith(skip) for skip in NEVER_SAVE_TAGS)
+                and (
+                    v.requires_grad
+                    or any(tag in k for tag in ALWAYS_SAVE_TAGS)
+                )
             )
         }
 
@@ -174,7 +197,8 @@ class CheckpointManager:
             # Only report non-backbone missing keys (backbone is always missing, that's expected)
             non_backbone_missing = [k for k in missing if 'lora_' in k or
                                     any(t in k for t in ('attention_pooling', 'composite_fusion',
-                                                          'text_adapter', 'sketch_decoder'))]
+                                                          'text_adapter', 'sketch_decoder',
+                                                          'moco_queue'))]
             if non_backbone_missing:
                 print(f"[Checkpoint] Missing adapter/head keys: {non_backbone_missing}")
             else:

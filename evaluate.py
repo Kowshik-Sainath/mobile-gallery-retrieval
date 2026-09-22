@@ -130,6 +130,7 @@ def evaluate_retrieval(model, test_loader, device="cuda"):
     with torch.no_grad():
         for i in tqdm(range(N), desc="Query-attended Retrieval"):
             sketch_q    = sketch_embeds[i:i+1].to(device)      # (1, D)
+            text_q      = text_embeds[i:i+1].to(device)        # (1, D)
             composite_q = composite_embeds[i:i+1].to(device)   # (1, D)
 
             # Process gallery in chunks to respect GPU memory
@@ -141,12 +142,13 @@ def evaluate_retrieval(model, test_loader, device="cuda"):
                 # patches_chunk: (chunk, 49, D) → GPU
                 patches_chunk = gallery_patches[j_start:j_end].to(device)
 
-                # Expand sketch_q to match chunk dimension
+                # Expand queries to match chunk dimension
                 sketch_expanded = sketch_q.expand(chunk_size, -1)   # (chunk, D)
+                text_expanded   = text_q.expand(chunk_size, -1)     # (chunk, D)
 
-                # Sketch-guided attention over each gallery photo's patch tokens
+                # TASKformer attention over each gallery photo's patch tokens
                 attended_chunk, _ = model.attention_pooling(
-                    sketch_expanded, patches_chunk
+                    patches_chunk, sketch_expanded, text_expanded
                 )                                                     # (chunk, D)
                 attended_chunk = F.normalize(attended_chunk, dim=-1)  # (chunk, D)
 
@@ -218,6 +220,18 @@ def main():
         "--attn_chunk", type=int, default=ATTENTION_CHUNK,
         help="Gallery chunk size for Phase 3 attention (reduce if OOM on GPU)"
     )
+    parser.add_argument(
+        "--use_hnsw", action="store_true",
+        help=(
+            "Load a pre-built HNSW index and evaluate fast-path retrieval latency. "
+            "Build the index first with: python -m src.search.gallery_indexer, then "
+            "python -m src.search.hnsw_index"
+        )
+    )
+    parser.add_argument(
+        "--hnsw_path", type=str, default="gallery_index/hnsw.usearch",
+        help="Path to pre-built HNSW index (used with --use_hnsw)"
+    )
     args = parser.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -245,6 +259,57 @@ def main():
     # Override attention chunk if specified
     ATTENTION_CHUNK = args.attn_chunk
 
+    # ----------------------------------------------------------------
+    # HNSW fast-path evaluation (Phase 4)
+    # ----------------------------------------------------------------
+    if args.use_hnsw:
+        import time, numpy as _np
+        from src.search.hnsw_index import HNSWSearchIndex
+
+        print(f"\n[Eval] HNSW Fast-Path Evaluation")
+        index = HNSWSearchIndex.load(args.hnsw_path)
+        print(f"[Eval] Loaded: {index}")
+
+        # Extract all query composite embeddings
+        model.eval()
+        all_composites, all_labels = [], []
+        with torch.no_grad():
+            for i, batch in enumerate(test_loader):
+                sketch   = batch['sketch'].to(device)
+                captions = batch['caption']
+                e_sketch = model.encode_sketch(sketch)
+                e_text   = model.encode_text(captions)
+                raw      = torch.cat([e_sketch, e_text], dim=-1)
+                e_comp   = F.normalize(model.composite_fusion(raw), dim=-1)
+                all_composites.append(e_comp.cpu().numpy())
+                all_labels.extend(range(i * args.batch_size,
+                                        i * args.batch_size + sketch.shape[0]))
+
+        queries_np = _np.vstack(all_composites).astype(_np.float32)   # (N, D)
+        N_q = len(queries_np)
+
+        # Benchmark: search all queries and measure latency
+        t0 = time.perf_counter()
+        indices, _ = index.search(queries_np, k=10)
+        elapsed_ms = (time.perf_counter() - t0) * 1000
+
+        # Recall@1, @5, @10 using HNSW results
+        r1 = sum(1 for i in range(N_q) if i in indices[i, :1])  / N_q * 100
+        r5 = sum(1 for i in range(N_q) if i in indices[i, :5])  / N_q * 100
+        r10= sum(1 for i in range(N_q) if i in indices[i, :10]) / N_q * 100
+
+        print(f"\n{'=' * 60}")
+        print(f"[HNSW] Recall@1:  {r1:.2f}%")
+        print(f"[HNSW] Recall@5:  {r5:.2f}%")
+        print(f"[HNSW] Recall@10: {r10:.2f}%")
+        print(f"[HNSW] Total search latency ({N_q} queries): {elapsed_ms:.1f} ms")
+        print(f"[HNSW] Per-query latency: {elapsed_ms/N_q*1000:.1f} µs")
+        print(f"{'=' * 60}\n")
+        return
+
+    # ----------------------------------------------------------------
+    # Standard O(N×N) eval
+    # ----------------------------------------------------------------
     results = evaluate_retrieval(model, test_loader, device=device)
 
     print("\n" + "=" * 72)

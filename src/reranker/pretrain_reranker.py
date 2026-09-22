@@ -65,7 +65,7 @@ def extract_embeddings(model, loader, device):
             e_sketch = model.encode_sketch(sketch)
             e_text = model.encode_text(captions)
             photo_patches = model.encode_photo_patches(photo)
-            attended_photo, _ = model.attention_pooling(e_sketch, photo_patches)
+            attended_photo, _ = model.attention_pooling(photo_patches, e_sketch, e_text)
             attended_photo = F.normalize(attended_photo, dim=-1)
 
             raw_composite = torch.cat([e_sketch, e_text], dim=-1)

@@ -138,9 +138,9 @@ def load_mobileclip_backbone(
 
 def apply_sketch_lora(
     model,
-    r_linear: int = 16,
+    r_linear: int = 64,
     r_conv: int = 4,
-    lora_alpha_linear: int = 32,
+    lora_alpha_linear: int = 128,
     lora_alpha_conv: int = 8,
     lora_dropout: float = 0.05,
     adapter_name: str = "sketch"
@@ -148,26 +148,28 @@ def apply_sketch_lora(
     """
     Two-Tier LoRA for MobileCLIP-S1 (FastViT backbone):
 
-    Tier 1 — Attention layers (network.7):
-        Target: qkv Linear modules.
-        Rank r=16, alpha=32. These layers handle semantic cross-modal attention.
+    Tier 1 — Attention + MLP layers (network.7):
+        Target: qkv, fc1, fc2 Linear modules.
+        Rank r=64, alpha=128 (strictly 2×r to prevent gradient spectral suppression).
+        These layers handle semantic cross-modal attention and MLP feature mixing.
+        At r=16/alpha=32 the model had only 434k trainable params — insufficient
+        to bridge the sketch-photo modality gap on scene-level FS-COCO. At r=64
+        this expands to ~3.5M while remaining well within mobile deployment budgets.
 
-    Tier 2 — RepMixer convolutional stages (network.1–6):
-        Target: reparam_conv Conv2d modules (1×1 MobileOneBlock convs).
-        Rank r=4, alpha=8. These layers handle spatial edge-detection filters
-        critical for freehand sketch domain adaptation.
+    Tier 2 — Point-wise Conv2d stages (network.1–6):
+        Target: groups=1 Conv2d modules (fc1/fc2/expand/reduce in FastViT blocks).
+        Rank r=4, alpha=8. These layers adapt early spatial edge-detection filters
+        critical for freehand sketch domain adaptation without touching depthwise convs.
 
     Design:
-        Uses a SINGLE LoraConfig with rank_pattern / lora_alpha_pattern to
+        Uses a SINGLE LoraConfig with rank_pattern / alpha_pattern to
         assign different ranks per-module type, avoiding the need for two
-        separate PEFT adapter attachment calls (which would require two
-        get_peft_model calls and complex adapter merging).
+        separate PEFT adapter attachment calls.
 
     Safety:
         - Only leaf names exclusively mapping to nn.Linear are used for Tier 1.
-        - Only leaf names exclusively mapping to nn.Conv2d are used for Tier 2.
-        - Name collisions (leaf appears as both Linear and Sequential/Conv2d)
-          are excluded — same logic as the original fix for 'proj' bug.
+        - Only leaf names exclusively mapping to nn.Conv2d with groups=1 for Tier 2.
+        - Known depthwise leaves ('reparam_conv', 'conv') are explicitly banned.
     """
     if not PEFT_AVAILABLE:
         raise ImportError(

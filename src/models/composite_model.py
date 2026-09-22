@@ -3,12 +3,12 @@ Composite Text + Sketch Based Image Retrieval Model.
 
 Architecture:
   - MobileCLIP-S1 (FastViT) backbone — frozen base weights.
-  - Two-tier sketch LoRA: Conv2d r=4 (RepMixer stages) + Linear r=16 (attention).
+  - Two-tier sketch LoRA: Conv2d r=4 (point-wise stages) + Linear r=64/alpha=128 (qkv, fc1, fc2).
   - MoCo momentum queue (K=4096) for small-batch InfoNCE.
   - Strict modality isolation: sketch pass = LoRA ON (then OFF), photo = LoRA always OFF.
   - PatchTokenExtractor hooks conv_exp for real (B, 49, D) spatial tokens.
-  - SketchGuidedAttentionPooling: sketch attends over 49 patch tokens.
-  - Text adapter (2-layer bottleneck 256d) for FS-COCO long captions.
+  - TASKformerCrossAttention: photo patches Q over [sketch‖text] K/V for spatial grounding.
+  - SketchObjectDetectionHead: focal-loss L_OD auxiliary head for patch-level grounding.
   - Auxiliary SketchReconstructionDecoder for structural regularization (train-only).
 
 Component 3 (Modality Contamination Fix):
@@ -28,7 +28,7 @@ import torch.nn.functional as F
 from contextlib import nullcontext
 
 from .backbone import load_mobileclip_backbone, apply_sketch_lora
-from .stnet_modules import SketchGuidedAttentionPooling, SketchReconstructionDecoder
+from .stnet_modules import TASKformerCrossAttention, SketchObjectDetectionHead, SketchReconstructionDecoder
 from .patch_hook import PatchTokenExtractor
 from .moco_queue import MoCoQueue
 
@@ -59,7 +59,7 @@ class TSBIRCompositeModel(nn.Module):
             device=device,
         )
 
-        # --- Two-tier sketch LoRA (Conv2d r=4 + Linear r=16) ---
+        # --- Two-tier sketch LoRA (Conv2d r=4 + Linear r=64) ---
         self.backbone = apply_sketch_lora(self.backbone, adapter_name="sketch")
 
         # --- MoCo: momentum encoder = deep copy of base MCi (no LoRA) ---
@@ -108,8 +108,9 @@ class TSBIRCompositeModel(nn.Module):
             nn.Linear(256, embed_dim),
         )
 
-        # --- STNet Attention Pooling + Reconstruction Decoder ---
-        self.attention_pooling = SketchGuidedAttentionPooling(embed_dim=embed_dim)
+        # --- STNet TASK-former Cross-Attention + Reconstruction Decoder + OD Head ---
+        self.attention_pooling = TASKformerCrossAttention(embed_dim=embed_dim)
+        self.od_head = SketchObjectDetectionHead(embed_dim=embed_dim)
         self.sketch_decoder = SketchReconstructionDecoder(embed_dim=embed_dim)
 
     # -----------------------------------------------------------------------
@@ -239,7 +240,7 @@ class TSBIRCompositeModel(nn.Module):
         """
         Full forward pass: sketch + text → composite query vs MoCo photo keys.
 
-        Loss = InfoNCEWithQueue(composite_query, photo_key, moco_queue) + 0.5 * MSE_rec
+        Loss = L_CT + 0.3·L_SR + 0.2·L_OD
 
         Component 1 (MoCo):
           - Photo is encoded via momentum encoder → photo_key (no grad).
@@ -251,7 +252,7 @@ class TSBIRCompositeModel(nn.Module):
           - encode_photo_patches() and encode_photo_key() run with LoRA OFF.
 
         Returns dict with:
-          loss, loss_infonce, loss_rec, composite_query, attended_photo, recon_sketch
+          loss, loss_infonce, loss_rec, loss_od, composite_query, attended_photo, recon_sketch
         """
         # 1. Disentangled embeddings
         # encode_sketch: LoRA ON → encode → LoRA OFF
@@ -268,8 +269,9 @@ class TSBIRCompositeModel(nn.Module):
         raw_composite = torch.cat([e_sketch, e_text], dim=-1)
         composite_query = F.normalize(self.composite_fusion(raw_composite), dim=-1)
 
-        # 4. Sketch-guided attention pooling over patch tokens
-        attended_photo, attn_probs = self.attention_pooling(e_sketch, photo_patches)
+        # 4. TASK-former: photo patches as Q, [sketch, text] as K/V
+        #    Produces a spatially-grounded, query-conditioned photo embedding
+        attended_photo, attn_probs = self.attention_pooling(photo_patches, e_sketch, e_text)
         attended_photo = F.normalize(attended_photo, dim=-1)
 
         # 5. InfoNCE with MoCo queue (4096 negatives)
@@ -278,20 +280,27 @@ class TSBIRCompositeModel(nn.Module):
         # 6. Update MoCo queue AFTER computing loss
         self.moco_queue.dequeue_and_enqueue(photo_key)
 
-        # 7. Auxiliary reconstruction loss (training only)
+        # 7. Auxiliary OD loss — sketch-patch spatial grounding (training only)
+        loss_od = torch.tensor(0.0, device=self.device)
+        if self.training:
+            loss_od, _heatmap = self.od_head(photo_patches, e_sketch)
+
+        # 8. Auxiliary reconstruction loss (training only)
         loss_rec = torch.tensor(0.0, device=self.device)
         recon_sketch = None
         if target_sketch_tensor is not None and self.training:
             recon_sketch = self.sketch_decoder(e_sketch)
             loss_rec = F.mse_loss(recon_sketch, target_sketch_tensor)
 
-        total_loss = loss_infonce + 0.5 * loss_rec
+        # L = L_CT + 0.3·L_SR + 0.2·L_OD
+        total_loss = loss_infonce + 0.3 * loss_rec + 0.2 * loss_od
 
         return {
-            'loss': total_loss,
-            'loss_infonce': loss_infonce,
-            'loss_rec': loss_rec,
+            'loss':          total_loss,
+            'loss_infonce':  loss_infonce,
+            'loss_rec':      loss_rec,
+            'loss_od':       loss_od,
             'composite_query': composite_query,
-            'attended_photo': attended_photo,
-            'recon_sketch': recon_sketch,
+            'attended_photo':  attended_photo,
+            'recon_sketch':    recon_sketch,
         }

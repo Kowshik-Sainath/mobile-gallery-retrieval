@@ -41,6 +41,7 @@ def train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device, e
     total_loss = 0.0
     total_infonce = 0.0
     total_rec = 0.0
+    total_od  = 0.0
 
     pbar = tqdm(train_loader, desc=f"[Train] Epoch {epoch}")
     for step, batch in enumerate(pbar):
@@ -66,24 +67,29 @@ def train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device, e
         model.momentum_update()
         scheduler.step()
 
-        total_loss += loss.item()
+        total_loss    += loss.item()
         total_infonce += outputs['loss_infonce'].item()
-        total_rec += outputs['loss_rec'].item()
+        total_rec     += outputs['loss_rec'].item()
+        total_od      += outputs.get('loss_od', torch.tensor(0.0)).item()
 
         pbar.set_postfix({
-            'Loss': f"{loss.item():.4f}",
+            'Loss':    f"{loss.item():.4f}",
             'InfoNCE': f"{outputs['loss_infonce'].item():.4f}",
-            'LR': f"{scheduler.get_last_lr()[0]:.2e}",
+            'OD':      f"{outputs.get('loss_od', torch.tensor(0.0)).item():.4f}",
+            'LR':      f"{scheduler.get_last_lr()[0]:.2e}",
         })
 
-    avg_loss = total_loss / len(train_loader)
+    n = len(train_loader)
+    avg_loss = total_loss / n
     print(
         f"[Train] Epoch {epoch} | "
         f"Avg Loss: {avg_loss:.4f} | "
-        f"InfoNCE: {total_infonce/len(train_loader):.4f} | "
-        f"Rec: {total_rec/len(train_loader):.4f}"
+        f"InfoNCE: {total_infonce/n:.4f} | "
+        f"Rec: {total_rec/n:.4f} | "
+        f"OD: {total_od/n:.4f}"
     )
     return avg_loss
+
 
 
 # ---------------------------------------------------------------------------

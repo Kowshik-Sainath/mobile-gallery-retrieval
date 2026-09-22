@@ -31,6 +31,7 @@ class FSCOCODataset(Dataset):
 
         self.samples = []
         self._load_samples(test_split_file)
+        self._validate_samples()
 
     def _load_samples(self, test_split_file):
         test_ids = set()
@@ -82,37 +83,80 @@ class FSCOCODataset(Dataset):
                         'sketch_path': sketch_full_path
                     })
 
+    def _validate_samples(self):
+        """
+        Pre-filter samples whose image files cannot be opened.
+
+        Windows raises OSError [Errno 22] (Invalid Argument) for zero-byte,
+        truncated, or path-too-long image files.  Catching these at init time
+        prevents DataLoader worker crashes during training.
+        """
+        valid = []
+        skipped = 0
+        for s in self.samples:
+            try:
+                with Image.open(s['photo_path']) as im:
+                    im.verify()        # checks file header without decoding pixels
+                with Image.open(s['sketch_path']) as im:
+                    im.verify()
+                valid.append(s)
+            except Exception:
+                skipped += 1
+        if skipped:
+            print(
+                f"[Dataset] WARNING: skipped {skipped} corrupt/unreadable "
+                f"image pairs (out of {len(self.samples)} total). "
+                f"Remaining valid samples: {len(valid)}."
+            )
+        self.samples = valid
+
     def __len__(self):
         return len(self.samples)
 
     def __getitem__(self, idx):
         sample = self.samples[idx]
-        
+
         # Load text caption
         with open(sample['text_path'], 'r', encoding='utf-8') as f:
             caption = f.read().strip()
 
-        # Load images
-        photo_img = Image.open(sample['photo_path']).convert('RGB')
-        sketch_img = Image.open(sample['sketch_path']).convert('RGB')
+        # Load images — guard against corrupt files that slipped past validation
+        # (e.g. files that verify() passes but fail on full decode).
+        # On failure, fall back to the previous valid index.
+        try:
+            photo_img  = Image.open(sample['photo_path']).convert('RGB')
+            sketch_img = Image.open(sample['sketch_path']).convert('RGB')
+        except (OSError, SyntaxError, Exception) as e:
+            fallback_idx = (idx - 1) % len(self.samples)
+            print(
+                f"[Dataset] WARNING: could not open image for sample '{sample['id']}' "
+                f"({type(e).__name__}: {e}). Returning sample {fallback_idx} as fallback."
+            )
+            return self.__getitem__(fallback_idx)
 
-        photo_tensor = self.photo_transform(photo_img)
+        photo_tensor  = self.photo_transform(photo_img)
         sketch_tensor = self.sketch_transform(sketch_img)
         target_sketch_tensor = self.target_sketch_transform(sketch_img)
 
         return {
-            'id': sample['id'],
-            'sketch': sketch_tensor,
-            'caption': caption,
-            'photo': photo_tensor,
-            'target_sketch': target_sketch_tensor
+            'id':             sample['id'],
+            'sketch':         sketch_tensor,
+            'caption':        caption,
+            'photo':          photo_tensor,
+            'target_sketch':  target_sketch_tensor,
         }
 
 def get_fscoco_dataloaders(root_dir, batch_size=32, num_workers=2):
     train_dataset = FSCOCODataset(root_dir, split='train')
-    test_dataset = FSCOCODataset(root_dir, split='test')
+    test_dataset  = FSCOCODataset(root_dir, split='test')
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, drop_last=True)
-    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, drop_last=False)
+    train_loader = DataLoader(
+        train_dataset, batch_size=batch_size, shuffle=True,
+        num_workers=num_workers, drop_last=True,
+    )
+    test_loader = DataLoader(
+        test_dataset, batch_size=batch_size, shuffle=False,
+        num_workers=num_workers, drop_last=False,
+    )
 
     return train_loader, test_loader
