@@ -26,7 +26,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 import sys
 import torch
 import torch.nn.functional as F
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 
 # Ensure project root is on path when run as module
@@ -41,10 +41,11 @@ CHECKPOINT_PATH = "checkpoints/checkpoint_best.pt"
 BACKBONE_PATH   = "checkpoints/mobileclip_s1.pt"
 OUTPUT_PATH     = "checkpoints/combiner_pretrained.pt"
 DATA_DIR        = "fscoco"
-EPOCHS          = 10
-BATCH_SIZE      = 32
-LR              = 5e-4
-TRIPLET_MARGIN  = 0.3
+EPOCHS              = 10
+EXTRACT_BATCH_SIZE  = 32
+TRAIN_BATCH_SIZE    = 2048
+LR                  = 5e-4
+TRIPLET_MARGIN  = 0.5
 
 
 def extract_embeddings(model, loader, device):
@@ -167,19 +168,22 @@ def pretrain(queries, photos, combiner, device, epochs=EPOCHS, lr=LR):
     # Pre-normalise the entire gallery (used for semi-hard mining)
     gallery_photos = F.normalize(photos, dim=-1).to(device)
 
+    train_tensor_dataset = TensorDataset(queries, photos)
+    train_tensor_loader = DataLoader(
+        train_tensor_dataset, 
+        batch_size=TRAIN_BATCH_SIZE, 
+        shuffle=True, 
+        drop_last=True
+    )
+
     for epoch in range(1, epochs + 1):
         combiner.train()
-        perm = torch.randperm(N)
-        queries_shuffled = queries[perm]
-        photos_shuffled  = photos[perm]
-
         total_loss = 0.0
         n_batches  = 0
 
-        for start in range(0, N, BATCH_SIZE):
-            end = min(start + BATCH_SIZE, N)
-            q_batch = F.normalize(queries_shuffled[start:end], dim=-1).to(device)
-            p_batch = F.normalize(photos_shuffled[start:end], dim=-1).to(device)
+        for q_batch, p_batch in train_tensor_loader:
+            q_batch = F.normalize(q_batch, dim=-1).to(device)
+            p_batch = F.normalize(p_batch, dim=-1).to(device)
             B = q_batch.shape[0]
             if B < 2:
                 continue
@@ -188,6 +192,7 @@ def pretrain(queries, photos, combiner, device, epochs=EPOCHS, lr=LR):
 
             # Positive scores
             pos_scores = combiner(q_batch, p_batch).squeeze(-1)
+            pos_scores = F.normalize(pos_scores, dim=-1)
 
             # Semi-hard negatives mined from FULL gallery
             with torch.no_grad():
@@ -195,6 +200,7 @@ def pretrain(queries, photos, combiner, device, epochs=EPOCHS, lr=LR):
                     q_batch, p_batch, gallery_photos, margin=TRIPLET_MARGIN
                 )
             neg_scores = combiner(q_batch, neg_photos).squeeze(-1)
+            neg_scores = F.normalize(neg_scores, dim=-1)
 
             loss = F.relu(TRIPLET_MARGIN - pos_scores + neg_scores).mean()
             loss.backward()
@@ -267,7 +273,7 @@ def main():
 
     print(f"[CombinerPretrain] Loading FS-COCO train split: {DATA_DIR}")
     train_dataset = FSCOCODataset(DATA_DIR, split='train')
-    train_loader  = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=False, num_workers=2)
+    train_loader  = DataLoader(train_dataset, batch_size=EXTRACT_BATCH_SIZE, shuffle=False, num_workers=2)
     print(f"[CombinerPretrain] Train samples: {len(train_dataset)}")
 
     queries, photos = extract_embeddings(retrieval_model, train_loader, device)

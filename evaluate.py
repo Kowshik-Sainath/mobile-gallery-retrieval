@@ -208,6 +208,8 @@ def evaluate_retrieval(model, test_loader, device="cuda"):
 
 
 def main():
+    global ATTENTION_CHUNK
+    
     parser = argparse.ArgumentParser(description="Evaluate T+SBIR Model on FS-COCO Test Split")
     parser.add_argument("--data_dir",    type=str, default="fscoco")
     parser.add_argument("--batch_size",  type=int, default=32)
@@ -241,7 +243,6 @@ def main():
     model.to(device)
 
     # Override attention chunk if specified
-    global ATTENTION_CHUNK
     ATTENTION_CHUNK = args.attn_chunk
 
     results = evaluate_retrieval(model, test_loader, device=device)

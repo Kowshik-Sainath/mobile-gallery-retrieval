@@ -204,15 +204,22 @@ def apply_sketch_lora(
     if not linear_targets:
         linear_targets = sorted(safe_linear_leaves)
 
-    # --- Tier 2: collision-free Conv2d-only leaf names ---
+    # --- Tier 2: Dynamic 1x1 Conv2d across the whole vision encoder ---
+    conv_targets_set = set()
+    for full_name, module in img_enc.named_modules():
+        if isinstance(module, nn.Conv2d) and getattr(module, 'groups', 1) == 1:
+            leaf = full_name.split('.')[-1]
+            conv_targets_set.add(leaf)
+
+    # Prevent PEFT crashes by excluding leaf names used by non-Conv2d modules
+    # AND explicitly ban known depthwise convolutional leaf names.
+    unsafe_depthwise_leaves = {'reparam_conv', 'conv'}
+    
     safe_conv2d_leaves = {
         leaf for leaf, types in leaf_to_types.items()
-        if types == {nn.Conv2d}
+        if types == {nn.Conv2d} and leaf not in unsafe_depthwise_leaves
     }
-    # reparam_conv: 1×1 MobileOneBlock conv in RepMixer stages — best LoRA candidate.
-    # Exclude conv_exp (hooked for patch tokens) and depthwise convs.
-    preferred_conv = {'reparam_conv'}
-    conv_targets = sorted(safe_conv2d_leaves & preferred_conv)
+    conv_targets = sorted(conv_targets_set & safe_conv2d_leaves)
 
     all_targets = linear_targets + conv_targets
     assert len(all_targets) > 0, (
@@ -227,13 +234,6 @@ def apply_sketch_lora(
     if ambiguous_linear:
         print(f"[LoRA] Excluded ambiguous Linear leaves: {sorted(ambiguous_linear)}")
 
-    ambiguous_conv = {
-        leaf for leaf, types in leaf_to_types.items()
-        if nn.Conv2d in types and len(types) > 1
-    }
-    if ambiguous_conv:
-        print(f"[LoRA] Excluded ambiguous Conv2d leaves: {sorted(ambiguous_conv)}")
-
     print(
         f"[LoRA] Two-tier targeting:\n"
         f"  Tier 1 Linear  (r={r_linear}): {linear_targets}\n"
@@ -242,11 +242,12 @@ def apply_sketch_lora(
 
     # --- Build rank_pattern for per-module rank overrides ---
     # rank_pattern keys are regex patterns matched against the full module path.
-    # '.*<leaf_name>' matches any path ending with that leaf name.
+    import re
     rank_pattern = {}
     alpha_pattern = {}
-    for leaf in conv_targets:
-        pattern = f'.*{leaf}'
+    for target in conv_targets:
+        # Match the leaf name precisely at the end of the module path
+        pattern = f'.*\\.{re.escape(target)}$'
         rank_pattern[pattern] = r_conv
         alpha_pattern[pattern] = lora_alpha_conv
 
