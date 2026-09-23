@@ -162,4 +162,7 @@ class PatchTokenExtractor(nn.Module):
             self._hook_handle = None
 
     def __del__(self):
-        self.remove()
+        try:
+            self.remove()
+        except Exception:
+            pass

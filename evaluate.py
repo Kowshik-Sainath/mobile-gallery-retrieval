@@ -199,7 +199,7 @@ def evaluate_retrieval(model, test_loader, device="cuda"):
     )
     if gap <= 0:
         print(
-            "[Warning] STNet-Aligned R@1 ≤ Misaligned R@1.\n"
+            "[Warning] STNet-Aligned R@1 <= Misaligned R@1.\n"
             "  Possible causes:\n"
             "  - Patch token diversity issue (PatchTokenExtractor hook not firing)\n"
             "  - LoRA not adapting edge filters (check Tier 2 Conv2d attachment)\n"
@@ -232,12 +232,19 @@ def main():
         "--hnsw_path", type=str, default="gallery_index/hnsw.usearch",
         help="Path to pre-built HNSW index (used with --use_hnsw)"
     )
+    parser.add_argument(
+        "--max_samples", type=int, default=None,
+        help="Optional maximum number of evaluation samples to use."
+    )
     args = parser.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"[Eval] Device: {device}")
 
     test_dataset = FSCOCODataset(args.data_dir, split='test')
+    if args.max_samples and args.max_samples < len(test_dataset):
+        from torch.utils.data import Subset
+        test_dataset = Subset(test_dataset, list(range(args.max_samples)))
     test_loader  = DataLoader(test_dataset, batch_size=args.batch_size, shuffle=False)
     print(f"[Eval] FS-COCO Test Split: {len(test_dataset)} samples")
 
@@ -250,7 +257,7 @@ def main():
         missing, unexpected = model.load_state_dict(state, strict=False)
         non_backbone_missing = [k for k in missing if 'lora_' in k or
                                 any(t in k for t in ('attention_pooling', 'composite_fusion',
-                                                      'text_adapter', 'sketch_decoder', 'moco'))]
+                                                      'text_adapter', 'sketch_decoder', 'moco_queue'))]
         if non_backbone_missing:
             print(f"[Eval] Missing non-backbone keys: {non_backbone_missing}")
 

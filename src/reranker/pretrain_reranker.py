@@ -64,15 +64,13 @@ def extract_embeddings(model, loader, device):
 
             e_sketch = model.encode_sketch(sketch)
             e_text = model.encode_text(captions)
-            photo_patches = model.encode_photo_patches(photo)
-            attended_photo, _ = model.attention_pooling(photo_patches, e_sketch, e_text)
-            attended_photo = F.normalize(attended_photo, dim=-1)
+            e_photo = model.encode_photo(photo)
 
             raw_composite = torch.cat([e_sketch, e_text], dim=-1)
             e_composite = F.normalize(model.composite_fusion(raw_composite), dim=-1)
 
             all_queries.append(e_composite.cpu())
-            all_photos.append(attended_photo.cpu())
+            all_photos.append(e_photo.cpu())
 
     queries = torch.cat(all_queries, dim=0)   # (N, 512)
     photos  = torch.cat(all_photos, dim=0)    # (N, 512)
@@ -225,7 +223,7 @@ def pretrain(queries, photos, combiner, device, epochs=EPOCHS, lr=LR):
                 {'epoch': epoch, 'loss': avg_loss, 'state_dict': combiner.state_dict()},
                 OUTPUT_PATH
             )
-            print(f"[CombinerPretrain] New best saved → {OUTPUT_PATH}")
+            print(f"[CombinerPretrain] New best saved -> {OUTPUT_PATH}")
 
     return best_loss
 
@@ -271,12 +269,22 @@ def main():
 
     retrieval_model.to(device)
 
-    print(f"[CombinerPretrain] Loading FS-COCO train split: {DATA_DIR}")
-    train_dataset = FSCOCODataset(DATA_DIR, split='train')
-    train_loader  = DataLoader(train_dataset, batch_size=EXTRACT_BATCH_SIZE, shuffle=False, num_workers=2)
-    print(f"[CombinerPretrain] Train samples: {len(train_dataset)}")
+    cache_file = "checkpoints/extracted_train_embeddings.pt"
+    if os.path.exists(cache_file):
+        print(f"[CombinerPretrain] Loading pre-extracted embeddings from '{cache_file}'...")
+        cached = torch.load(cache_file, map_location='cpu', weights_only=False)
+        queries = cached['queries']
+        photos = cached['photos']
+    else:
+        print(f"[CombinerPretrain] Loading FS-COCO train split: {DATA_DIR}")
+        train_dataset = FSCOCODataset(DATA_DIR, split='train')
+        train_loader  = DataLoader(train_dataset, batch_size=EXTRACT_BATCH_SIZE, shuffle=False, num_workers=2)
+        print(f"[CombinerPretrain] Train samples: {len(train_dataset)}")
 
-    queries, photos = extract_embeddings(retrieval_model, train_loader, device)
+        queries, photos = extract_embeddings(retrieval_model, train_loader, device)
+        torch.save({'queries': queries, 'photos': photos}, cache_file)
+        print(f"[CombinerPretrain] Saved extracted embeddings to '{cache_file}'")
+
     print(f"[CombinerPretrain] Embeddings: queries={queries.shape}, photos={photos.shape}")
 
     combiner = FeedbackCombinerReranker(feature_dim=512).to(device)

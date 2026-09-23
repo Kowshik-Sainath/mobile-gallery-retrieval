@@ -41,7 +41,7 @@ def train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device, e
     total_loss = 0.0
     total_infonce = 0.0
     total_rec = 0.0
-    total_od  = 0.0
+    total_attn = 0.0
 
     pbar = tqdm(train_loader, desc=f"[Train] Epoch {epoch}")
     for step, batch in enumerate(pbar):
@@ -63,19 +63,17 @@ def train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device, e
         )
         scaler.step(optimizer)
         scaler.update()
-        # Component 1 (MoCo): EMA update of momentum encoder after every optimizer step
-        model.momentum_update()
         scheduler.step()
 
         total_loss    += loss.item()
         total_infonce += outputs['loss_infonce'].item()
         total_rec     += outputs['loss_rec'].item()
-        total_od      += outputs.get('loss_od', torch.tensor(0.0)).item()
+        total_attn    += outputs.get('loss_attn', torch.tensor(0.0)).item()
 
         pbar.set_postfix({
             'Loss':    f"{loss.item():.4f}",
             'InfoNCE': f"{outputs['loss_infonce'].item():.4f}",
-            'OD':      f"{outputs.get('loss_od', torch.tensor(0.0)).item():.4f}",
+            'Attn':    f"{outputs.get('loss_attn', torch.tensor(0.0)).item():.4f}",
             'LR':      f"{scheduler.get_last_lr()[0]:.2e}",
         })
 
@@ -86,7 +84,7 @@ def train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device, e
         f"Avg Loss: {avg_loss:.4f} | "
         f"InfoNCE: {total_infonce/n:.4f} | "
         f"Rec: {total_rec/n:.4f} | "
-        f"OD: {total_od/n:.4f}"
+        f"Attn: {total_attn/n:.4f}"
     )
     return avg_loss
 
@@ -147,6 +145,14 @@ def main():
             "Old checkpoints are archived to checkpoints/archived_old_lora/ for safety."
         )
     )
+    parser.add_argument(
+        "--max_train_samples", type=int, default=None,
+        help="Optional limit on number of train samples (useful for fast verification gates)."
+    )
+    parser.add_argument(
+        "--loss_attn_weight", type=float, default=0.1,
+        help="Weight for the positive-pair attention alignment loss (Step 4)."
+    )
     args = parser.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -158,6 +164,14 @@ def main():
         train_loader, val_loader = get_fscoco_dataloaders(
             args.data_dir, batch_size=args.batch_size
         )
+        if args.max_train_samples and args.max_train_samples < len(train_loader.dataset):
+            from torch.utils.data import Subset, DataLoader
+            subset_indices = list(range(args.max_train_samples))
+            train_subset = Subset(train_loader.dataset, subset_indices)
+            train_loader = DataLoader(
+                train_subset, batch_size=args.batch_size, shuffle=True,
+                num_workers=train_loader.num_workers, drop_last=True
+            )
         print(
             f"[Data] Train: {len(train_loader.dataset)} | "
             f"Val: {len(val_loader.dataset)} samples"
@@ -167,7 +181,7 @@ def main():
         sys.exit(1)
 
     # --- Model ---
-    model = TSBIRCompositeModel(device=device)
+    model = TSBIRCompositeModel(device=device, loss_attn_weight=args.loss_attn_weight)
     model.to(device)
 
     trainable_params = [p for p in model.parameters() if p.requires_grad]
@@ -230,6 +244,7 @@ def main():
         print(
             f"[FreshStart] Starting clean training run with LoRA targets: {_current_lora_targets}"
         )
+        model.populate_queue_with_real_photos(train_loader, max_samples=model.moco_queue.queue_size)
         start_epoch, global_step = 0, 0
     else:
         start_epoch, global_step = checkpoint_mgr.load_latest_checkpoint(
@@ -268,7 +283,7 @@ def main():
                 model, optimizer, epoch, global_step, train_loss, val_loss=val_loss,
                 filename="checkpoint_best.pt"
             )
-            print(f"[Val] ✓ New best val loss: {best_val_loss:.4f} → checkpoint_best.pt saved")
+            print(f"[Val] [*] New best val loss: {best_val_loss:.4f} -> checkpoint_best.pt saved")
         else:
             patience_counter += 1
             print(

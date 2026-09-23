@@ -19,7 +19,9 @@ class FSCOCODataset(Dataset):
         super().__init__()
         self.root_dir = root_dir
         self.split = split
-        self.photo_transform, self.sketch_transform, self.target_sketch_transform = get_transforms(image_size)
+        self.photo_transform, self.sketch_transform, self.target_sketch_transform = get_transforms(
+            image_size, is_train=(split == 'train')
+        )
         
         # Determine actual root path
         if not os.path.exists(os.path.join(root_dir, 'images')) and os.path.exists(os.path.join(root_dir, 'fscoco', 'images')):

@@ -80,19 +80,13 @@ class CheckpointManager:
             'moco_queue.queue',        # ← MoCo FIFO buffer (register_buffer, not param)
             'moco_queue.queue_ptr',    # ← MoCo write pointer  (register_buffer, not param)
         )
-        NEVER_SAVE_TAGS = (
-            'momentum_encoder.',       # frozen EMA copy (~82 MB) — always rebuilt on load
-        )
 
         trainable_state = {
             k: v
             for k, v in model.state_dict().items()
             if (
-                not any(k.startswith(skip) for skip in NEVER_SAVE_TAGS)
-                and (
-                    v.requires_grad
-                    or any(tag in k for tag in ALWAYS_SAVE_TAGS)
-                )
+                v.requires_grad
+                or any(tag in k for tag in ALWAYS_SAVE_TAGS)
             )
         }
 
