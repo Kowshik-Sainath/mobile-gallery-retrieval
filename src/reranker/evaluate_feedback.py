@@ -11,6 +11,18 @@ Evaluates the CLIP4Cir FeedbackComposedRetriever across three distinct regimes:
      Original query with the shown wrong candidate simply masked out (zero learning).
      The learned Combiner MUST beat this baseline to prove genuine semantic steering.
 
+Full-Gallery Re-Search vs. Candidate Reranking:
+  - In traditional candidate reranking (e.g. cross-encoders or pointwise scorers), the model
+    only re-scores the initial top-K returned candidates. If the true target photo fell outside
+    top-K due to an ambiguous initial query, it can NEVER be retrieved.
+  - In CLIP4Cir composed retrieval (implemented here), the combiner maps:
+        q_combined = Combiner(shown_candidate, refined_query)
+    into a NEW query embedding in the shared 512-D multimodal space.
+    This new vector is used to re-search the ENTIRE gallery matrix (N photos).
+    This enables true discovery: correct photos that were ranked beyond the initial top-K
+    are pulled forward into the top ranks by the composed vector, rather than merely shuffling
+    the already-returned candidates.
+
 Run: python -m src.reranker.evaluate_feedback
 """
 

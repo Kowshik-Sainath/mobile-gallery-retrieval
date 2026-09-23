@@ -97,6 +97,11 @@ class TSBIRCompositeModel(nn.Module):
         )
 
         # --- STNet TASK-former Cross-Attention + Reconstruction Decoder + OD Head ---
+        # NOTE: Deprecated/Inactive in Production Dual-Encoder Pipeline.
+        # Patch extraction and cross-attention alignment were evaluated and removed from the active
+        # retrieval pipeline because empirical tests showed pure dual-encoder achieved 19.10% R@1
+        # whereas early patch-attention collapsed to 0.20% R@1. These modules are retained
+        # only for auxiliary reconstruction loss (sketch_decoder) or backward compatibility.
         self.attention_pooling = TASKformerCrossAttention(embed_dim=embed_dim)
         self.od_head = SketchObjectDetectionHead(embed_dim=embed_dim)
         self.sketch_decoder = SketchReconstructionDecoder(embed_dim=embed_dim)
@@ -164,8 +169,10 @@ class TSBIRCompositeModel(nn.Module):
 
     def encode_photo_patches(self, photo_tensor: torch.Tensor) -> torch.Tensor:
         """
+        DEPRECATED: Preserved for benchmark diagnostics only.
         Extracts pre-pooling spatial patch tokens (B, N, D) from FastViT conv_exp
         output via PatchTokenExtractor hook. LoRA is disabled (photos use base weights).
+        Not used during standard dual-encoder retrieval.
         """
         with self._disable_adapter_ctx():
             _ = self.backbone.encode_image(photo_tensor)

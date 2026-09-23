@@ -29,6 +29,7 @@ except Exception:
 import argparse
 import time
 import torch
+import torch.nn.functional as F
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from tqdm import tqdm
 
@@ -96,10 +97,46 @@ def train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device, e
 # FIX C — Validation loop
 # ---------------------------------------------------------------------------
 
+def evaluate_diagnostic_subset(model, val_loader, device, max_samples=100):
+    """
+    Computes quick R@1 diagnostic on a small validation subset during training.
+    Immediately catches representation collapse / drift without waiting 25 epochs.
+    """
+    model.eval()
+    q_embs, p_embs = [], []
+    collected = 0
+    with torch.no_grad():
+        for batch in val_loader:
+            photos   = batch['photo'].to(device)
+            sketches = batch['sketch'].to(device)
+            texts    = batch['caption']
+            token_ids = model.tokenizer(texts).to(device)
+            t_emb = model.encode_text(token_ids)
+            s_emb = model.encode_sketch(sketches)
+            raw_comp = torch.cat([s_emb, t_emb], dim=-1)
+            q_emb = F.normalize(model.composite_fusion(raw_comp), dim=-1)
+            p_emb = model.encode_photo(photos)
+
+            q_embs.append(q_emb.cpu())
+            p_embs.append(p_emb.cpu())
+            collected += len(photos)
+            if collected >= max_samples:
+                break
+
+    Q = torch.cat(q_embs, dim=0)[:collected]
+    P = torch.cat(p_embs, dim=0)[:collected]
+    sim = torch.mm(Q, P.t())
+    ranks = torch.argsort(sim, dim=-1, descending=True)
+    targets = torch.arange(collected)
+    r1 = (ranks[:, 0] == targets).float().mean().item() * 100.0
+    return r1, collected
+
+
 def validate_one_epoch(model, val_loader, device, epoch):
     """
     Computes validation InfoNCE loss on the test split.
     No gradient computation. Uses same forward pass as training.
+    Also logs quick Diagnostic R@1 on 100 validation samples.
     """
     model.eval()
     total_val_loss = 0.0
@@ -119,7 +156,13 @@ def validate_one_epoch(model, val_loader, device, epoch):
             pbar.set_postfix({'Val InfoNCE': f"{outputs['loss_infonce'].item():.4f}"})
 
     avg_val = total_val_loss / len(val_loader)
-    print(f"[Val]   Epoch {epoch} | Avg Val InfoNCE: {avg_val:.4f}")
+    try:
+        r1_diag, n_diag = evaluate_diagnostic_subset(model, val_loader, device, max_samples=100)
+        chance = 100.0 / n_diag
+        print(f"[Val]   Epoch {epoch} | Avg Val InfoNCE: {avg_val:.4f} | Diagnostic R@1 ({n_diag} val samples): {r1_diag:.2f}% (Chance: {chance:.2f}%)")
+    except Exception as e:
+        print(f"[Val]   Epoch {epoch} | Avg Val InfoNCE: {avg_val:.4f} (Diagnostic R@1 skipped: {e})")
+
     return avg_val
 
 
