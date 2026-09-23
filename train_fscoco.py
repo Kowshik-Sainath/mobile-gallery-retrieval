@@ -21,6 +21,11 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
 import sys
+try:
+    sys.stdout.reconfigure(line_buffering=True)
+    sys.stderr.reconfigure(line_buffering=True)
+except Exception:
+    pass
 import argparse
 import time
 import torch
@@ -68,12 +73,10 @@ def train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device, e
         total_loss    += loss.item()
         total_infonce += outputs['loss_infonce'].item()
         total_rec     += outputs['loss_rec'].item()
-        total_attn    += outputs.get('loss_attn', torch.tensor(0.0)).item()
 
         pbar.set_postfix({
             'Loss':    f"{loss.item():.4f}",
             'InfoNCE': f"{outputs['loss_infonce'].item():.4f}",
-            'Attn':    f"{outputs.get('loss_attn', torch.tensor(0.0)).item():.4f}",
             'LR':      f"{scheduler.get_last_lr()[0]:.2e}",
         })
 
@@ -83,8 +86,7 @@ def train_one_epoch(model, train_loader, optimizer, scaler, scheduler, device, e
         f"[Train] Epoch {epoch} | "
         f"Avg Loss: {avg_loss:.4f} | "
         f"InfoNCE: {total_infonce/n:.4f} | "
-        f"Rec: {total_rec/n:.4f} | "
-        f"Attn: {total_attn/n:.4f}"
+        f"Rec: {total_rec/n:.4f}"
     )
     return avg_loss
 
@@ -150,8 +152,8 @@ def main():
         help="Optional limit on number of train samples (useful for fast verification gates)."
     )
     parser.add_argument(
-        "--loss_attn_weight", type=float, default=0.1,
-        help="Weight for the positive-pair attention alignment loss (Step 4)."
+        "--loss_attn_weight", type=float, default=0.0,
+        help="Weight for the positive-pair attention alignment loss (Step 4, default 0.0)."
     )
     args = parser.parse_args()
 

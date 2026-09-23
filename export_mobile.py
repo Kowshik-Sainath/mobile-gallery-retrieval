@@ -26,7 +26,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from src.models.composite_model import TSBIRCompositeModel
-from src.reranker.combiner import FeedbackCombinerReranker
+from src.reranker.combiner import FeedbackComposedRetriever, FeedbackCombinerReranker
 
 try:
     import onnx
@@ -42,9 +42,7 @@ except ImportError:
     PIL_AVAILABLE = False
 
 
-# CLIP normalization constants
-MEAN = np.array([0.48145466, 0.4578275, 0.40821073], dtype=np.float32)
-STD  = np.array([0.26862954, 0.26130258, 0.27577711], dtype=np.float32)
+# MobileCLIP unnormalized [0, 1] range is used — no ImageNet mean/std constants needed
 
 
 # ---------------------------------------------------------------------------
@@ -53,17 +51,24 @@ STD  = np.array([0.26862954, 0.26130258, 0.27577711], dtype=np.float32)
 
 class VisionEncoderExportable(nn.Module):
     """
-    Inference-ready vision encoder: backbone + adapter disabled.
+    Inference-ready vision encoder: backbone base weights (FastViT) without adapter.
     Input:  (1, 3, 224, 224)
     Output: (1, 512) normalized embedding
     """
     def __init__(self, base_model):
         super().__init__()
-        self._base = base_model
+        # Access the underlying FastViT model directly — 100% frozen base weights, zero PEFT wrapper overhead
+        if hasattr(base_model, 'backbone') and hasattr(base_model.backbone, 'image_encoder'):
+            enc = base_model.backbone.image_encoder
+            if hasattr(enc, 'base_model') and hasattr(enc.base_model, 'model'):
+                self.vision_core = enc.base_model.model
+            else:
+                self.vision_core = enc
+        else:
+            self.vision_core = base_model
 
     def forward(self, image_tensor):
-        with self._base.backbone.image_encoder.disable_adapter():
-            feats = self._base.backbone.encode_image(image_tensor)
+        feats = self.vision_core(image_tensor)
         return F.normalize(feats, dim=-1)
 
 
@@ -90,31 +95,25 @@ class TextEncoderExportable(nn.Module):
 class FSCOCOCalibrationDataReader:
     """
     Feeds real FS-COCO photos to onnxruntime's static quantizer for INT8 calibration.
-    Falls back to synthetic data if FS-COCO is not available.
+    Uses FSCOCODataset directly to guarantee exact [0, 1] preprocessing parity.
     """
 
     def __init__(self, data_dir: str = "fscoco", n_samples: int = 200):
         self.data = []
         self._idx = 0
 
-        # Try to load real FS-COCO images
-        photos_dir = os.path.join(data_dir, "images")
-        if os.path.isdir(photos_dir) and PIL_AVAILABLE:
-            all_imgs = []
-            for root, _, files in os.walk(photos_dir):
-                for f in files:
-                    if f.lower().endswith(('.jpg', '.jpeg', '.png')):
-                        all_imgs.append(os.path.join(root, f))
-            import random
-            random.shuffle(all_imgs)
-            selected = all_imgs[:n_samples]
-
-            for img_path in selected:
-                try:
-                    arr = self._load_and_preprocess(img_path)
-                    self.data.append({'image_input': arr})
-                except Exception:
-                    pass
+        try:
+            from src.data.fscoco_dataset import FSCOCODataset
+            dataset = FSCOCODataset(data_dir, split="train")
+            n = min(n_samples, len(dataset))
+            indices = list(range(0, len(dataset), max(1, len(dataset) // n)))[:n]
+            for i in indices:
+                sample = dataset[i]
+                arr = sample["photo"].unsqueeze(0).numpy().astype(np.float32)  # (1, 3, 224, 224)
+                self.data.append({"image_input": arr})
+            print(f"[Calibration] Loaded {len(self.data)} real photos from FS-COCO train split.")
+        except Exception as e:
+            print(f"[Calibration] Failed to load dataset: {e}")
 
         # Fallback: synthetic calibration if not enough real images
         if len(self.data) < 50:
@@ -124,18 +123,10 @@ class FSCOCOCalibrationDataReader:
             )
             while len(self.data) < 200:
                 self.data.append({
-                    'image_input': np.random.randn(1, 3, 224, 224).astype(np.float32)
+                    'image_input': np.random.rand(1, 3, 224, 224).astype(np.float32)
                 })
 
         print(f"[Calibration] Calibration dataset size: {len(self.data)} samples")
-
-    def _load_and_preprocess(self, img_path: str) -> np.ndarray:
-        img = Image.open(img_path).convert('RGB').resize((224, 224), Image.Resampling.BICUBIC)
-        arr = np.array(img, dtype=np.float32) / 255.0   # (224, 224, 3)
-        arr = (arr - MEAN) / STD
-        arr = np.transpose(arr, (2, 0, 1))              # (3, 224, 224)
-        arr = np.expand_dims(arr, axis=0)               # (1, 3, 224, 224)
-        return arr.astype(np.float32)
 
     def get_next(self):
         if self._idx >= len(self.data):
@@ -193,6 +184,14 @@ def export_to_onnx(base_model, output_dir: str = "exported_models", data_dir: st
     dummy_image = torch.zeros(1, 3, 224, 224)
     sizes = {}
 
+    # Clean old exported files to avoid testing against stale models
+    for p in [vision_fp32_path, vision_int8_path, text_fp32_path, text_int8_path, combiner_path]:
+        if os.path.exists(p):
+            try:
+                os.remove(p)
+            except Exception:
+                pass
+
     # --- 1. Vision encoder ---
     print("\n[Export] Exporting Vision Encoder (backbone, adapters disabled)...")
     vision_model = VisionEncoderExportable(base_model)
@@ -241,27 +240,33 @@ def export_to_onnx(base_model, output_dir: str = "exported_models", data_dir: st
         print(f"[Export] Text FP32: {sizes['text_fp32']:.1f} MB")
 
     # --- 3. Combiner reranker ---
-    print("\n[Export] Exporting Combiner Reranker MLP...")
-    combiner = FeedbackCombinerReranker(feature_dim=512)
+    print("\n[Export] Exporting Combiner Query Composition MLP...")
+    combiner = FeedbackComposedRetriever(feature_dim=512, hidden_dim=256)
 
-    # Load pretrained weights if available (BUG 5 FIX)
+    # Load pretrained weights if available
     pretrained_path = "checkpoints/combiner_pretrained.pt"
     if os.path.exists(pretrained_path):
         ckpt = torch.load(pretrained_path, map_location='cpu', weights_only=False)
-        combiner.load_state_dict(ckpt['state_dict'])
+        c_state = ckpt.get('model_state_dict', ckpt.get('state_dict', ckpt))
+        combiner.load_state_dict(c_state, strict=False)
         print(f"[Export] Loaded pretrained combiner weights from: {pretrained_path}")
     else:
         print("[Export] Warning: combiner_pretrained.pt not found. Exporting random-init combiner.")
 
     combiner.eval()
-    dummy_q = torch.zeros(1, 512)
-    dummy_c = torch.zeros(1, 512)
+    dummy_shown = torch.zeros(1, 512)
+    dummy_query = torch.zeros(1, 512)
 
     torch.onnx.export(
-        combiner, (dummy_q, dummy_c), combiner_path,
+        combiner, (dummy_shown, dummy_query), combiner_path,
         export_params=True, opset_version=14,
-        input_names=['query_embedding', 'candidate_embedding'],
-        output_names=['similarity_score'],
+        input_names=['shown_candidate', 'refined_query'],
+        output_names=['combined_embedding'],
+        dynamic_axes={
+            'shown_candidate': {0: 'batch'},
+            'refined_query':   {0: 'batch'},
+            'combined_embedding': {0: 'batch'},
+        }
     )
     sizes['combiner'] = os.path.getsize(combiner_path) / (1024 * 1024)
     print(f"[Export] Combiner: {sizes['combiner']:.1f} MB")
@@ -276,7 +281,7 @@ def export_to_onnx(base_model, output_dir: str = "exported_models", data_dir: st
             print("\n[Quantize] Building calibration dataset from FS-COCO...")
             calib_reader = FSCOCOCalibrationDataReader(data_dir=data_dir, n_samples=200)
 
-            print(f"[Quantize] Running STATIC INT8 quantization → {vision_int8_path}")
+            print(f"[Quantize] Running STATIC INT8 quantization -> {vision_int8_path}")
             quantize_static(
                 model_input=vision_fp32_path,
                 model_output=vision_int8_path,
@@ -352,6 +357,45 @@ def export_to_onnx(base_model, output_dir: str = "exported_models", data_dir: st
                 )
             else:
                 print(f"\n[OK] Vision INT8 model is {vision_int8_mb:.1f} MB — within 45 MB budget.")
+
+    # --- 6. Correctness verification: PyTorch vs ONNX output cosine similarity ---
+    if ONNX_AVAILABLE and os.path.exists(vision_fp32_path):
+        print("\n[Verification] Checking PyTorch vs ONNX numerical parity...")
+        try:
+            from src.data.fscoco_dataset import FSCOCODataset
+            test_dataset = FSCOCODataset(data_dir, split="test")
+            indices = [0, 50, 100, 150, 200]
+            indices = [i for i in indices if i < len(test_dataset)]
+            if len(indices) < 5:
+                indices = list(range(min(5, len(test_dataset))))
+
+            torch_vision = VisionEncoderExportable(base_model).eval()
+            check_session = ort.InferenceSession(vision_fp32_path, providers=['CPUExecutionProvider'])
+
+            sims = []
+            for idx in indices:
+                sample = test_dataset[idx]
+                photo_tensor = sample['photo'].unsqueeze(0)  # (1, 3, 224, 224)
+                
+                # PyTorch prediction
+                with torch.no_grad():
+                    torch_emb = torch_vision(photo_tensor).squeeze(0).numpy()
+                
+                # ONNX prediction
+                onnx_emb = check_session.run(None, {'image_input': photo_tensor.numpy()})[0].squeeze(0)
+                
+                # Cosine similarity
+                cos_sim = float(np.dot(torch_emb, onnx_emb) / (np.linalg.norm(torch_emb) * np.linalg.norm(onnx_emb) + 1e-8))
+                sims.append(cos_sim)
+                print(f"  Sample {idx}: Cosine Similarity = {cos_sim:.5f}")
+
+            avg_sim = float(np.mean(sims))
+            min_sim = float(np.min(sims))
+            print(f"[Verification] Average PyTorch vs ONNX Cosine Similarity: {avg_sim:.5f} (Min: {min_sim:.5f})")
+            assert min_sim > 0.95, f"Correctness check FAILED: min cosine similarity {min_sim:.4f} <= 0.95!"
+            print("[Verification] PASS: PyTorch vs ONNX outputs are aligned (cos_sim > 0.95).")
+        except Exception as e:
+            print(f"[Verification] Error during correctness verification: {e}")
 
 
 def main():

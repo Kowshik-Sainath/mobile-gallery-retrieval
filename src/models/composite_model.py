@@ -46,7 +46,7 @@ class TSBIRCompositeModel(nn.Module):
         moco_queue_size: int = 4096,
         moco_momentum: float = 0.999,
         temperature: float = 0.07,
-        loss_attn_weight: float = 0.1,
+        loss_attn_weight: float = 0.0,
     ):
         super().__init__()
         self.device = device
@@ -214,67 +214,53 @@ class TSBIRCompositeModel(nn.Module):
         """
         Full forward pass: sketch + text → composite query vs MoCo photo keys.
 
-        Loss = L_CT + 0.3·L_SR + 0.2·L_OD
+        Loss = L_InfoNCE + 0.3·L_SR
 
         Component 1 (MoCo):
-          - Photo is encoded via momentum encoder → photo_key (no grad).
+          - Photo is encoded via encode_photo_key() (frozen base weights, LoRA OFF, no grad).
           - InfoNCE uses photo_key as positive + 4096-entry queue as negatives.
           - Queue is updated AFTER loss computation with current batch's photo_key.
 
         Component 3 (Modality Isolation):
           - encode_sketch() enables LoRA, encodes, disables LoRA.
-          - encode_photo_patches() and encode_photo_key() run with LoRA OFF.
+          - encode_photo_key() runs with LoRA OFF.
 
         Returns dict with:
-          loss, loss_infonce, loss_rec, loss_od, composite_query, attended_photo, recon_sketch
+          loss, loss_infonce, loss_rec, composite_query, recon_sketch
         """
         # 1. Disentangled embeddings
         # encode_sketch: LoRA ON → encode → LoRA OFF
         e_sketch = self.encode_sketch(sketch_tensor)         # (B, D)
         # encode_text: no LoRA involved
         e_text = self.encode_text(text_list)                 # (B, D)
-        # encode_photo_patches: LoRA OFF, hooks conv_exp
-        photo_patches = self.encode_photo_patches(photo_tensor)  # (B, 49, D)
 
-        # 2. MoCo: encode photo key with momentum encoder (no grad)
+        # 2. MoCo: encode photo key with frozen backbone (no grad)
         photo_key = self.encode_photo_key(photo_tensor)          # (B, D), no grad
 
         # 3. Composite query
         raw_composite = torch.cat([e_sketch, e_text], dim=-1)
         composite_query = F.normalize(self.composite_fusion(raw_composite), dim=-1)
 
-        # 4. TASK-former: photo patches as Q, [sketch, text] as K/V
-        #    Produces a spatially-grounded, query-conditioned photo embedding
-        attended_photo, attn_probs = self.attention_pooling(photo_patches, e_sketch, e_text)
-        attended_photo = F.normalize(attended_photo, dim=-1)
-
-        # 5. InfoNCE with MoCo queue (4096 negatives)
+        # 4. InfoNCE with MoCo queue (4096 negatives)
         loss_infonce = self.moco_queue.infonce_loss(composite_query, photo_key)
 
-        # 6. Update MoCo queue AFTER computing loss
+        # 5. Update MoCo queue AFTER computing loss
         self.moco_queue.dequeue_and_enqueue(photo_key)
 
-        # 7. Auxiliary attention alignment loss (Step 4)
-        # Directly supervises attended_photo so TASK-former receives non-zero gradient.
-        # Cheap positive-pair cosine distance: forces attended photo to align with composite query.
-        loss_attn = (1.0 - (composite_query * attended_photo).sum(dim=-1)).mean()
-
-        # 8. Auxiliary reconstruction loss (training only)
+        # 6. Auxiliary reconstruction loss (training only)
         loss_rec = torch.tensor(0.0, device=self.device)
         recon_sketch = None
         if target_sketch_tensor is not None and self.training:
             recon_sketch = self.sketch_decoder(e_sketch)
             loss_rec = F.mse_loss(recon_sketch, target_sketch_tensor)
 
-        # L = L_CT + 0.3·L_SR + loss_attn_weight·L_attn
-        total_loss = loss_infonce + 0.3 * loss_rec + self.loss_attn_weight * loss_attn
+        # L = L_InfoNCE + 0.3·L_SR
+        total_loss = loss_infonce + 0.3 * loss_rec
 
         return {
-            'loss':          total_loss,
-            'loss_infonce':  loss_infonce,
-            'loss_rec':      loss_rec,
-            'loss_attn':     loss_attn,
+            'loss':            total_loss,
+            'loss_infonce':    loss_infonce,
+            'loss_rec':        loss_rec,
             'composite_query': composite_query,
-            'attended_photo':  attended_photo,
             'recon_sketch':    recon_sketch,
         }

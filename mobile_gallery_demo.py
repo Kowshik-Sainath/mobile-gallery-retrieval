@@ -37,14 +37,10 @@ app = Flask(__name__) if FLASK_AVAILABLE else None
 # ONNX Sessions
 vision_session = None
 combiner_session = None
+py_combiner = None
 
 # SQLite gallery database path
 GALLERY_DB_PATH = "gallery.db"
-
-# CLIP Normalization constants
-MEAN = np.array([0.48145466, 0.4578275, 0.40821073], dtype=np.float32).reshape(1, 3, 1, 1)
-STD  = np.array([0.26862954, 0.26130258, 0.27577711], dtype=np.float32).reshape(1, 3, 1, 1)
-
 EMBED_DIM = 512
 
 
@@ -112,11 +108,11 @@ def load_gallery_matrix():
 # ---------------------------------------------------------------------------
 
 def preprocess_image(pil_img: Image.Image) -> np.ndarray:
+    # MobileCLIP uses [0, 1] range without ImageNet mean/std normalization
     img = pil_img.convert('RGB').resize((224, 224), Image.Resampling.BICUBIC)
     arr = np.array(img, dtype=np.float32) / 255.0   # HWC
     arr = np.transpose(arr, (2, 0, 1))              # CHW
     arr = np.expand_dims(arr, axis=0)               # NCHW
-    arr = (arr - MEAN) / STD
     return arr.astype(np.float32)
 
 
@@ -399,6 +395,90 @@ def search():
 
     latency_ms = (time.time() - t0) * 1000.0
     return jsonify({'results': results, 'latency_ms': latency_ms})
+
+
+@app.route('/refine', methods=['POST'])
+def refine():
+    """
+    Feedback-driven composed retrieval endpoint.
+    Takes shown_filename (photo the user saw/rejected) + refined query
+    (optional new sketch_b64 and/or text), computes combined embedding,
+    and returns re-ranked gallery results, explicitly excluding shown_filename.
+    """
+    t0 = time.time()
+    data = request.json or {}
+    shown_filename = data.get('shown_filename', '')
+    sketch_b64 = data.get('sketch_b64', '')
+
+    with get_db() as conn:
+        row = conn.execute("SELECT embedding FROM gallery WHERE filename = ?", (shown_filename,)).fetchone()
+        if not row:
+            return jsonify({'error': f"Shown photo '{shown_filename}' not found in gallery."}), 404
+        shown_emb = blob_to_embedding(row['embedding'])  # (512,)
+
+    # Extract refined query embedding
+    if sketch_b64:
+        if ',' in sketch_b64:
+            sketch_b64 = sketch_b64.split(',')[1]
+        sketch_data = base64.b64decode(sketch_b64)
+        sketch_img = Image.open(io.BytesIO(sketch_data)).convert('RGB')
+        sketch_np = preprocess_image(sketch_img)
+        sketch_outputs = vision_session.run(None, {'image_input': sketch_np})
+        ref_query_emb = sketch_outputs[0][0]  # (512,)
+    else:
+        ref_query_emb = shown_emb.copy()
+
+    # Query composition using Combiner ONNX or PyTorch module
+    global combiner_session, py_combiner
+    if combiner_session is not None:
+        c_in = {
+            'shown_candidate': shown_emb.reshape(1, -1).astype(np.float32),
+            'refined_query': ref_query_emb.reshape(1, -1).astype(np.float32)
+        }
+        combined_emb = combiner_session.run(None, c_in)[0][0]
+    else:
+        # Fallback to PyTorch module if ONNX not yet exported
+        if py_combiner is None:
+            from src.reranker.combiner import FeedbackComposedRetriever
+            import torch
+            py_combiner = FeedbackComposedRetriever(512, 256)
+            c_ckpt_path = "checkpoints/combiner_pretrained.pt"
+            if os.path.exists(c_ckpt_path):
+                ckpt = torch.load(c_ckpt_path, map_location='cpu', weights_only=False)
+                py_combiner.load_state_dict(ckpt.get('model_state_dict', ckpt), strict=False)
+            py_combiner.eval()
+        import torch
+        with torch.no_grad():
+            t_sh = torch.from_numpy(shown_emb).unsqueeze(0).float()
+            t_q = torch.from_numpy(ref_query_emb).unsqueeze(0).float()
+            combined_emb = py_combiner(t_sh, t_q).squeeze(0).numpy()
+
+    gallery_matrix, filenames, thumbnails = load_gallery_matrix()
+    if gallery_matrix is None:
+        return jsonify({'results': [], 'latency_ms': 0.0})
+
+    scores = gallery_matrix @ combined_emb
+
+    # Explicitly filter shown_filename out of the refined result list (UX requirement)
+    filtered_results = []
+    top_indices = np.argsort(scores)[::-1]
+    for idx in top_indices:
+        if filenames[idx] == shown_filename:
+            continue  # Exclude the rejected photo
+        filtered_results.append({
+            'filename': filenames[idx],
+            'score': float(scores[idx]),
+            'image_b64': thumbnails[idx],
+        })
+        if len(filtered_results) >= 9:
+            break
+
+    latency_ms = (time.time() - t0) * 1000.0
+    return jsonify({
+        'results': filtered_results,
+        'excluded_photo': shown_filename,
+        'latency_ms': latency_ms
+    })
 
 
 @app.route('/clear_gallery', methods=['POST'])

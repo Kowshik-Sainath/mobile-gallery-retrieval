@@ -42,7 +42,7 @@ from src.utils.metrics import compute_recall_at_k, compute_ndcg_at_k
 ATTENTION_CHUNK = 128
 
 
-def evaluate_retrieval(model, test_loader, device="cuda"):
+def evaluate_retrieval(model, test_loader, device="cuda", skip_stnet=False):
     """
     Correct O(N_query × N_gallery) evaluation for STNet-Aligned mode.
 
@@ -123,42 +123,45 @@ def evaluate_retrieval(model, test_loader, device="cuda"):
     #
     # This is the ONLY correct eval for sketch-guided attention pooling:
     # the attended photo representation is query-specific.
-    # ----------------------------------------------------------------
-    print("[Eval] Phase 3: O(N×N) STNet-Aligned similarity computation...")
-    sim_stnet = torch.zeros(N, N, dtype=torch.float32)
+    if not skip_stnet:
+        print("[Eval] Phase 3: O(N×N) STNet-Aligned similarity computation...")
+        sim_stnet = torch.zeros(N, N, dtype=torch.float32)
 
-    with torch.no_grad():
-        for i in tqdm(range(N), desc="Query-attended Retrieval"):
-            sketch_q    = sketch_embeds[i:i+1].to(device)      # (1, D)
-            text_q      = text_embeds[i:i+1].to(device)        # (1, D)
-            composite_q = composite_embeds[i:i+1].to(device)   # (1, D)
+        with torch.no_grad():
+            for i in tqdm(range(N), desc="Query-attended Retrieval"):
+                sketch_q    = sketch_embeds[i:i+1].to(device)      # (1, D)
+                text_q      = text_embeds[i:i+1].to(device)        # (1, D)
+                composite_q = composite_embeds[i:i+1].to(device)   # (1, D)
 
-            # Process gallery in chunks to respect GPU memory
-            row_chunks = []
-            for j_start in range(0, N, ATTENTION_CHUNK):
-                j_end = min(j_start + ATTENTION_CHUNK, N)
-                chunk_size = j_end - j_start
+                # Process gallery in chunks to respect GPU memory
+                row_chunks = []
+                for j_start in range(0, N, ATTENTION_CHUNK):
+                    j_end = min(j_start + ATTENTION_CHUNK, N)
+                    chunk_size = j_end - j_start
 
-                # patches_chunk: (chunk, 49, D) → GPU
-                patches_chunk = gallery_patches[j_start:j_end].to(device)
+                    # patches_chunk: (chunk, 49, D) → GPU
+                    patches_chunk = gallery_patches[j_start:j_end].to(device)
 
-                # Expand queries to match chunk dimension
-                sketch_expanded = sketch_q.expand(chunk_size, -1)   # (chunk, D)
-                text_expanded   = text_q.expand(chunk_size, -1)     # (chunk, D)
+                    # Expand queries to match chunk dimension
+                    sketch_expanded = sketch_q.expand(chunk_size, -1)   # (chunk, D)
+                    text_expanded   = text_q.expand(chunk_size, -1)     # (chunk, D)
 
-                # TASKformer attention over each gallery photo's patch tokens
-                attended_chunk, _ = model.attention_pooling(
-                    patches_chunk, sketch_expanded, text_expanded
-                )                                                     # (chunk, D)
-                attended_chunk = F.normalize(attended_chunk, dim=-1)  # (chunk, D)
+                    # TASKformer attention over each gallery photo's patch tokens
+                    attended_chunk, _ = model.attention_pooling(
+                        patches_chunk, sketch_expanded, text_expanded
+                    )                                                     # (chunk, D)
+                    attended_chunk = F.normalize(attended_chunk, dim=-1)  # (chunk, D)
 
-                # Similarity: (1, D) × (D, chunk) → (1, chunk)
-                sims = torch.mm(composite_q, attended_chunk.t()).squeeze(0)  # (chunk,)
-                row_chunks.append(sims.cpu())
+                    # Similarity: (1, D) × (D, chunk) → (1, chunk)
+                    sims = torch.mm(composite_q, attended_chunk.t()).squeeze(0)  # (chunk,)
+                    row_chunks.append(sims.cpu())
 
-            sim_stnet[i] = torch.cat(row_chunks)
+                sim_stnet[i] = torch.cat(row_chunks)
 
-    sim_stnet_np = sim_stnet.numpy()
+        sim_stnet_np = sim_stnet.numpy()
+    else:
+        print("[Eval] Phase 3: Skipping STNet-Aligned similarity computation (--skip_stnet active).")
+        sim_stnet_np = None
 
     # ----------------------------------------------------------------
     # Phase 4: Compute metrics for all modes
@@ -182,29 +185,31 @@ def evaluate_retrieval(model, test_loader, device="cuda"):
     results['Composite (Late Fusion)'] = {**r_late, 'NDCG@10': ndcg_late}
 
     # 4. STNet Aligned — O(N×M) correct eval (matches training loss target)
-    r_stnet   = compute_recall_at_k(sim_stnet_np)
-    ndcg_stnet = compute_ndcg_at_k(sim_stnet_np)
-    results['Composite (STNet Aligned)'] = {**r_stnet, 'NDCG@10': ndcg_stnet}
+    if sim_stnet_np is not None:
+        r_stnet   = compute_recall_at_k(sim_stnet_np)
+        ndcg_stnet = compute_ndcg_at_k(sim_stnet_np)
+        results['Composite (STNet Aligned)'] = {**r_stnet, 'NDCG@10': ndcg_stnet}
 
     # 5. Diagnostic: misaligned composite vs raw photo
     r_misaligned = compute_recall_at_k(sim_composite_misaligned)
     results['[Diagnostic] Composite vs Raw Photo'] = {**r_misaligned, 'NDCG@10': 0.0}
 
     # Print alignment gap — STNet should beat misaligned if attention is working
-    gap = r_stnet.get('R@1', 0) - r_misaligned.get('R@1', 0)
-    print(
-        f"\n[Eval Diagnostic] STNet-Aligned R@1: {r_stnet.get('R@1', 0):.2f}% | "
-        f"Misaligned R@1: {r_misaligned.get('R@1', 0):.2f}% | "
-        f"Alignment Gap: {gap:+.2f}%"
-    )
-    if gap <= 0:
+    if sim_stnet_np is not None:
+        gap = r_stnet.get('R@1', 0) - r_misaligned.get('R@1', 0)
         print(
-            "[Warning] STNet-Aligned R@1 <= Misaligned R@1.\n"
-            "  Possible causes:\n"
-            "  - Patch token diversity issue (PatchTokenExtractor hook not firing)\n"
-            "  - LoRA not adapting edge filters (check Tier 2 Conv2d attachment)\n"
-            "  - MoCo queue not yet warm (train more epochs)"
+            f"\n[Eval Diagnostic] STNet-Aligned R@1: {r_stnet.get('R@1', 0):.2f}% | "
+            f"Misaligned R@1: {r_misaligned.get('R@1', 0):.2f}% | "
+            f"Alignment Gap: {gap:+.2f}%"
         )
+        if gap <= 0:
+            print(
+                "[Warning] STNet-Aligned R@1 <= Misaligned R@1.\n"
+                "  Possible causes:\n"
+                "  - Patch token diversity issue (PatchTokenExtractor hook not firing)\n"
+                "  - LoRA not adapting edge filters (check Tier 2 Conv2d attachment)\n"
+                "  - MoCo queue not yet warm (train more epochs)"
+            )
 
     return results
 
@@ -235,6 +240,10 @@ def main():
     parser.add_argument(
         "--max_samples", type=int, default=None,
         help="Optional maximum number of evaluation samples to use."
+    )
+    parser.add_argument(
+        "--skip_stnet", action="store_true",
+        help="Skip Phase 3 O(N×N) STNet attention computation for faster dual-encoder evaluation."
     )
     args = parser.parse_args()
 
@@ -317,7 +326,7 @@ def main():
     # ----------------------------------------------------------------
     # Standard O(N×N) eval
     # ----------------------------------------------------------------
-    results = evaluate_retrieval(model, test_loader, device=device)
+    results = evaluate_retrieval(model, test_loader, device=device, skip_stnet=args.skip_stnet)
 
     print("\n" + "=" * 72)
     print(f"{'Evaluation Mode':<37} | {'R@1':>5} | {'R@5':>5} | {'R@10':>5} | {'NDCG@10':>7}")
