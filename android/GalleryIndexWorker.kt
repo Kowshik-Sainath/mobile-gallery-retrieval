@@ -50,15 +50,11 @@ class GalleryIndexWorker(
         private const val TAG = "GalleryIndexWorker"
 
         // Asset name for the ONNX vision encoder
-        private const val ONNX_ASSET = "mobileclip_s1_vision.onnx"
+        private const val ONNX_ASSET = "photo_backbone_int8.onnx"
 
         // Model input/output names (as exported from PyTorch ONNX export)
-        private const val INPUT_NAME  = "image"
+        private const val INPUT_NAME  = "image_input"
         private const val OUTPUT_NAME = "embedding"
-
-        // ImageNet normalisation constants
-        private val MEAN = floatArrayOf(0.48145466f, 0.4578275f,  0.40821073f)
-        private val STD  = floatArrayOf(0.26862954f, 0.26130258f, 0.27577711f)
 
         // Image dimensions expected by MobileCLIP-S1
         private const val IMG_SIZE = 224
@@ -291,12 +287,10 @@ class GalleryIndexWorker(
 
         // Write channels in order: R, G, B
         for (c in 0..2) {
-            val mean = MEAN[c]
-            val std  = STD[c]
             val shift = when (c) { 0 -> 16; 1 -> 8; else -> 0 }
             for (p in 0 until numPixels) {
                 val channelVal = ((pixels[p] ushr shift) and 0xFF) / 255.0f
-                buffer.put((channelVal - mean) / std)
+                buffer.put(channelVal)
             }
         }
         buffer.rewind()
