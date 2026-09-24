@@ -119,6 +119,9 @@ class GalleryIndexWorker(
         val batchList = mutableListOf<GalleryEmbedding>()
 
         for (i in toIndex.indices) {
+            // Deprioritize background indexing if user has an interactive search in flight
+            SearchCoordinator.yieldIfSearchActive()
+
             val photo = toIndex[i]
             val bitmap = loadOptimizedBitmap(photo.uri)
 

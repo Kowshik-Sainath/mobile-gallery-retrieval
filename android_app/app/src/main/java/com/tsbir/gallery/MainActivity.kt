@@ -2,6 +2,7 @@ package com.tsbir.gallery
 
 import android.Manifest
 import android.app.Dialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -28,22 +29,36 @@ import com.tsbir.gallery.ui.RefineBottomSheetDialog
 import com.tsbir.gallery.ui.ResultsAdapter
 import com.tsbir.gallery.ui.SearchResultItem
 import com.tsbir.gallery.worker.GalleryIndexWorker
+import com.tsbir.gallery.worker.SearchCoordinator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.util.PriorityQueue
 
 class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val TAG = "MainActivity"
+        private const val TOP_K = 50
     }
+
+    private class MemoryGalleryIndex(
+        val count: Int,
+        val ids: LongArray,
+        val paths: Array<String>,
+        val embeddings: FloatArray // contiguous count * 512
+    )
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var resultsAdapter: ResultsAdapter
     private lateinit var modelManager: ModelManager
     private lateinit var database: GalleryDatabase
+
+    @Volatile
+    private var inMemoryIndex: MemoryGalleryIndex? = null
+    private var lastTopKResults: List<SearchResultItem> = emptyList()
 
     private val permissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -70,10 +85,30 @@ class MainActivity : AppCompatActivity() {
         setupCanvasControls()
         setupRecyclerView()
         checkPermissionsAndStartIndexing()
+
+        // Background warmup for instant interactive search
+        lifecycleScope.launch(Dispatchers.IO) {
+            delay(1000) // allow UI to settle smoothly
+            if (intent?.getBooleanExtra("BENCHMARK", false) != true) {
+                modelManager.warmupSearchSessions()
+                getOrBuildMemoryIndex() // Pre-load in-memory embeddings index into RAM
+            }
+        }
+
+        if (intent?.getBooleanExtra("BENCHMARK", false) == true) {
+            runBenchmarkSequence()
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent?.getBooleanExtra("BENCHMARK", false) == true) {
+            runBenchmarkSequence()
+        }
     }
 
     private fun setupToolbar() {
-        binding.tvEngineStatus.text = modelManager.executionProvider
+        binding.tvEngineStatus.text = "AI Ready (Lazy Loading)"
     }
 
     private fun setupTabs() {
@@ -156,6 +191,74 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private suspend fun getOrBuildMemoryIndex(): MemoryGalleryIndex = withContext(Dispatchers.IO) {
+        val dbCount = database.galleryEmbeddingDao().count()
+        val current = inMemoryIndex
+        if (current != null && current.count == dbCount) {
+            return@withContext current
+        }
+        val allEntries = database.galleryEmbeddingDao().getAll()
+        val n = allEntries.size
+        val ids = LongArray(n)
+        val paths = Array(n) { "" }
+        val flatEmbeddings = FloatArray(n * 512)
+
+        for (i in 0 until n) {
+            val entry = allEntries[i]
+            ids[i] = entry.mediaStoreId
+            paths[i] = entry.filePath
+            val floats = EmbeddingConverter.bytesToFloatArray(entry.embeddingBlob)
+            System.arraycopy(floats, 0, flatEmbeddings, i * 512, 512)
+        }
+        val built = MemoryGalleryIndex(n, ids, paths, flatEmbeddings)
+        inMemoryIndex = built
+        built
+    }
+
+    private suspend fun rankGalleryTopK(
+        queryEmb: FloatArray,
+        k: Int = TOP_K,
+        excludedMediaStoreId: Long? = null
+    ): Pair<List<SearchResultItem>, Long> = withContext(Dispatchers.Default) {
+        val tScan0 = System.nanoTime()
+        val index = getOrBuildMemoryIndex()
+        val n = index.count
+        if (n == 0) return@withContext Pair(emptyList(), (System.nanoTime() - tScan0) / 1_000_000)
+
+        val minHeap = PriorityQueue<SearchResultItem>(k + 1, compareBy { it.score })
+        val flat = index.embeddings
+
+        for (i in 0 until n) {
+            val id = index.ids[i]
+            if (excludedMediaStoreId != null && id == excludedMediaStoreId) continue
+
+            val offset = i * 512
+            var dot = 0.0f
+            for (d in 0 until 512) {
+                dot += queryEmb[d] * flat[offset + d]
+            }
+
+            if (minHeap.size < k) {
+                val embCopy = FloatArray(512)
+                System.arraycopy(flat, offset, embCopy, 0, 512)
+                minHeap.add(SearchResultItem(id, index.paths[i], dot, embCopy))
+            } else if (dot > minHeap.peek()!!.score) {
+                minHeap.poll()
+                val embCopy = FloatArray(512)
+                System.arraycopy(flat, offset, embCopy, 0, 512)
+                minHeap.add(SearchResultItem(id, index.paths[i], dot, embCopy))
+            }
+        }
+
+        val sortedResults = ArrayList<SearchResultItem>(minHeap.size)
+        while (minHeap.isNotEmpty()) {
+            sortedResults.add(minHeap.poll()!!)
+        }
+        sortedResults.reverse()
+        val scanMs = (System.nanoTime() - tScan0) / 1_000_000
+        Pair(sortedResults, scanMs)
+    }
+
     private fun executeSearch() {
         val text = binding.etSearchText.text?.toString()?.trim() ?: ""
         val hasText = text.isNotBlank()
@@ -167,38 +270,70 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.progressBar.visibility = View.VISIBLE
-        val t0 = System.currentTimeMillis()
+        val tTotal0 = System.nanoTime()
 
         lifecycleScope.launch {
-            val queryEmb = withContext(Dispatchers.Default) {
-                when {
-                    hasText && hasSketch -> {
-                        // Mode 3: Composite Fused Query
-                        val sketchBmp = binding.sketchCanvas.exportBitmap()
-                        val sEmb = modelManager.encodeSketch(sketchBmp)
-                        val tEmb = modelManager.encodeText(text)
-                        modelManager.fuseComposite(sEmb, tEmb)
-                    }
-                    hasText -> {
-                        // Mode 1: Text-Only Query (Direct text encoder, no dummy sketch)
-                        modelManager.encodeText(text)
-                    }
-                    else -> {
-                        // Mode 2: Sketch-Only Query (Direct sketch encoder, no dummy text)
-                        val sketchBmp = binding.sketchCanvas.exportBitmap()
-                        modelManager.encodeSketch(sketchBmp)
+            // Signal coordinator to pause background indexing
+            SearchCoordinator.isSearchActive = true
+            try {
+                var tTextMs = 0L
+                var tSketchMs = 0L
+                var tFusionMs = 0L
+                var modeStr = "Unknown"
+
+                val queryEmb = withContext(Dispatchers.Default) {
+                    when {
+                        hasText && hasSketch -> {
+                            modeStr = "Composite (Sketch + Text)"
+                            val tSk0 = System.nanoTime()
+                            val sketchBmp = binding.sketchCanvas.exportBitmap()
+                            val sEmb = modelManager.encodeSketch(sketchBmp)
+                            tSketchMs = (System.nanoTime() - tSk0) / 1_000_000
+
+                            val tTx0 = System.nanoTime()
+                            val tEmb = modelManager.encodeText(text)
+                            tTextMs = (System.nanoTime() - tTx0) / 1_000_000
+
+                            val tFu0 = System.nanoTime()
+                            val fused = modelManager.fuseComposite(sEmb, tEmb)
+                            tFusionMs = (System.nanoTime() - tFu0) / 1_000_000
+                            fused
+                        }
+                        hasText -> {
+                            modeStr = "Text-Only"
+                            val tTx0 = System.nanoTime()
+                            val tEmb = modelManager.encodeText(text)
+                            tTextMs = (System.nanoTime() - tTx0) / 1_000_000
+                            tEmb
+                        }
+                        else -> {
+                            modeStr = "Sketch-Only"
+                            val tSk0 = System.nanoTime()
+                            val sketchBmp = binding.sketchCanvas.exportBitmap()
+                            val sEmb = modelManager.encodeSketch(sketchBmp)
+                            tSketchMs = (System.nanoTime() - tSk0) / 1_000_000
+                            sEmb
+                        }
                     }
                 }
-            }
 
-            val results = withContext(Dispatchers.IO) {
-                rankGallery(queryEmb, excludedMediaStoreId = null)
-            }
+                val (results, scanMs) = rankGalleryTopK(queryEmb, k = TOP_K, excludedMediaStoreId = null)
+                lastTopKResults = results
 
-            val elapsedMs = System.currentTimeMillis() - t0
-            binding.progressBar.visibility = View.GONE
-            binding.tvResultsHeader.text = "Results (${results.size} photos found in ${elapsedMs}ms):"
-            resultsAdapter.submitList(results)
+                val tBind0 = System.nanoTime()
+                resultsAdapter.submitList(results)
+                val bindMs = (System.nanoTime() - tBind0) / 1_000_000
+                val totalMs = (System.nanoTime() - tTotal0) / 1_000_000
+
+                binding.progressBar.visibility = View.GONE
+                binding.tvEngineStatus.text = modelManager.executionProvider
+                binding.tvResultsHeader.text = "Results (Top ${results.size} in ${totalMs}ms | Scan: ${scanMs}ms):"
+
+                // Log structured profiling table
+                logProfilingTable(modeStr, tTextMs, tSketchMs, tFusionMs, scanMs, bindMs, totalMs, results.size)
+            } finally {
+                SearchCoordinator.isSearchActive = false
+            }
         }
     }
 
@@ -222,65 +357,95 @@ class MainActivity : AppCompatActivity() {
         rejectedItem: SearchResultItem
     ) {
         binding.progressBar.visibility = View.VISIBLE
-        val t0 = System.currentTimeMillis()
+        val tTotal0 = System.nanoTime()
 
         lifecycleScope.launch {
-            val refinedQueryEmb = withContext(Dispatchers.Default) {
-                val hasText = modifiedText.isNotBlank()
-                val hasSketch = modifiedSketchBitmap != null
+            SearchCoordinator.isSearchActive = true
+            try {
+                var tEncodeMs = 0L
+                var tCombinerMs = 0L
 
-                val newQuery = when {
-                    hasText && hasSketch -> {
-                        val sEmb = modelManager.encodeSketch(modifiedSketchBitmap!!)
-                        val tEmb = modelManager.encodeText(modifiedText)
-                        modelManager.fuseComposite(sEmb, tEmb)
+                val refinedQueryEmb = withContext(Dispatchers.Default) {
+                    val hasText = modifiedText.isNotBlank()
+                    val hasSketch = modifiedSketchBitmap != null
+
+                    val tEnc0 = System.nanoTime()
+                    val newQuery = when {
+                        hasText && hasSketch -> {
+                            val sEmb = modelManager.encodeSketch(modifiedSketchBitmap!!)
+                            val tEmb = modelManager.encodeText(modifiedText)
+                            modelManager.fuseComposite(sEmb, tEmb)
+                        }
+                        hasText -> modelManager.encodeText(modifiedText)
+                        hasSketch -> modelManager.encodeSketch(modifiedSketchBitmap!!)
+                        else -> rejectedItem.embedding.clone()
                     }
-                    hasText -> modelManager.encodeText(modifiedText)
-                    hasSketch -> modelManager.encodeSketch(modifiedSketchBitmap!!)
-                    else -> rejectedItem.embedding.clone()
+                    tEncodeMs = (System.nanoTime() - tEnc0) / 1_000_000
+
+                    val tComb0 = System.nanoTime()
+                    val combined = modelManager.refineFeedback(rejectedItem.embedding, newQuery)
+                    tCombinerMs = (System.nanoTime() - tComb0) / 1_000_000
+                    combined
                 }
 
-                // Call Combiner ONNX: (shown_candidate_embed, refined_query_embed) -> combined_embed
-                modelManager.refineFeedback(rejectedItem.embedding, newQuery)
-            }
+                // Scope refinement to Top-K candidates from initial search (Part K)
+                val tRerank0 = System.nanoTime()
+                val candidates = if (lastTopKResults.isNotEmpty()) lastTopKResults else emptyList()
+                val results = if (candidates.isNotEmpty()) {
+                    withContext(Dispatchers.Default) {
+                        val reranked = mutableListOf<SearchResultItem>()
+                        for (cand in candidates) {
+                            if (cand.mediaStoreId == rejectedItem.mediaStoreId) continue
+                            val score = modelManager.cosineSimilarity(refinedQueryEmb, cand.embedding)
+                            reranked.add(cand.copy(score = score))
+                        }
+                        reranked.sortByDescending { it.score }
+                        reranked
+                    }
+                } else {
+                    rankGalleryTopK(refinedQueryEmb, k = TOP_K, excludedMediaStoreId = rejectedItem.mediaStoreId).first
+                }
+                val rerankMs = (System.nanoTime() - tRerank0) / 1_000_000
+                lastTopKResults = results
 
-            val results = withContext(Dispatchers.IO) {
-                // Re-rank full gallery and explicitly exclude the rejected candidate
-                rankGallery(refinedQueryEmb, excludedMediaStoreId = rejectedItem.mediaStoreId)
-            }
+                val totalMs = (System.nanoTime() - tTotal0) / 1_000_000
+                binding.progressBar.visibility = View.GONE
+                binding.tvEngineStatus.text = modelManager.executionProvider
+                binding.tvResultsHeader.text = "Refined Results (Top ${results.size} in ${totalMs}ms | Rerank: ${rerankMs}ms):"
+                resultsAdapter.submitList(results)
+                Toast.makeText(this@MainActivity, "Refinement applied! Candidate excluded.", Toast.LENGTH_SHORT).show()
 
-            val elapsedMs = System.currentTimeMillis() - t0
-            binding.progressBar.visibility = View.GONE
-            binding.tvResultsHeader.text = "Refined Results (${results.size} photos, excluded rejected, in ${elapsedMs}ms):"
-            resultsAdapter.submitList(results)
-            Toast.makeText(this@MainActivity, "Refinement applied! Candidate excluded.", Toast.LENGTH_SHORT).show()
+                Log.i(TAG, "=== REFINE PROFILING === Query Encode: ${tEncodeMs}ms | Combiner: ${tCombinerMs}ms | Top-K Rerank: ${rerankMs}ms | Total: ${totalMs}ms")
+            } finally {
+                SearchCoordinator.isSearchActive = false
+            }
         }
     }
 
-    private suspend fun rankGallery(queryEmb: FloatArray, excludedMediaStoreId: Long?): List<SearchResultItem> {
-        val allEntries = database.galleryEmbeddingDao().getAll()
-        val scoredList = mutableListOf<SearchResultItem>()
-
-        for (entry in allEntries) {
-            if (excludedMediaStoreId != null && entry.mediaStoreId == excludedMediaStoreId) {
-                // Explicitly exclude rejected photo from CIRR-style results
-                continue
-            }
-            val emb = EmbeddingConverter.bytesToFloatArray(entry.embeddingBlob)
-            val score = modelManager.cosineSimilarity(queryEmb, emb)
-            scoredList.add(
-                SearchResultItem(
-                    mediaStoreId = entry.mediaStoreId,
-                    filePath = entry.filePath,
-                    score = score,
-                    embedding = emb
-                )
-            )
-        }
-
-        // Sort descending by cosine similarity score
-        scoredList.sortByDescending { it.score }
-        return scoredList
+    private fun logProfilingTable(
+        mode: String,
+        tTextMs: Long,
+        tSketchMs: Long,
+        tFusionMs: Long,
+        scanMs: Long,
+        bindMs: Long,
+        totalMs: Long,
+        resultCount: Int
+    ) {
+        val sb = StringBuilder()
+        sb.appendLine("\n================== TSBIR LATENCY BREAKDOWN (Mode: $mode) ==================")
+        sb.appendLine(String.format("%-32s | %s", "Stage", "Latency (ms)"))
+        sb.appendLine("-------------------------------------------------------------")
+        if (tTextMs > 0) sb.appendLine(String.format("%-32s | %d ms", "Text Tokenize + ONNX INT8", tTextMs))
+        if (tSketchMs > 0) sb.appendLine(String.format("%-32s | %d ms", "Sketch Preprocess + ONNX INT8", tSketchMs))
+        if (tFusionMs > 0) sb.appendLine(String.format("%-32s | %d ms", "Multimodal Fusion ONNX", tFusionMs))
+        sb.appendLine(String.format("%-32s | %d ms", "Matrix Vector Scan + Top-K", scanMs))
+        sb.appendLine(String.format("%-32s | %d ms", "UI Adapter Submit", bindMs))
+        sb.appendLine("-------------------------------------------------------------")
+        sb.appendLine(String.format("%-32s | %d ms (Top-%d returned)", "Total End-to-End Latency", totalMs, resultCount))
+        sb.appendLine("Provider: ${modelManager.executionProvider}")
+        sb.appendLine("===========================================================================")
+        Log.i("TSBIR_PROFILE", sb.toString())
     }
 
     private fun showFullPhotoDialog(item: SearchResultItem) {
@@ -300,5 +465,118 @@ class MainActivity : AppCompatActivity() {
 
         ivFull.setOnClickListener { dialog.dismiss() }
         dialog.show()
+    }
+
+    private fun runBenchmarkSequence() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            SearchCoordinator.isSearchActive = true
+            try {
+                Log.i("TSBIR_BENCHMARK", "========== STARTING ON-DEVICE BENCHMARK SEQUENCE ==========")
+
+                // Part 1: Execution Provider Comparison (Text Mode)
+                Log.i("TSBIR_BENCHMARK", "Testing Provider 1: AUTO_NNAPI (2 threads)...")
+                val (coldNnapi, warmNnapi) = modelManager.benchmarkTextProvider(ModelManager.ProviderPreference.AUTO_NNAPI, 2)
+
+                Log.i("TSBIR_BENCHMARK", "Testing Provider 2: CPU_ONLY (2 threads)...")
+                val (coldCpu2, warmCpu2) = modelManager.benchmarkTextProvider(ModelManager.ProviderPreference.CPU_ONLY, 2)
+
+                Log.i("TSBIR_BENCHMARK", "Testing Provider 3: CPU_ONLY (4 threads)...")
+                val (coldCpu4, warmCpu4) = modelManager.benchmarkTextProvider(ModelManager.ProviderPreference.CPU_ONLY, 4)
+
+                Log.i("TSBIR_BENCHMARK", "Testing Provider 4: XNNPACK (2 threads)...")
+                val (coldXnnpack, warmXnnpack) = try {
+                    modelManager.benchmarkTextProvider(ModelManager.ProviderPreference.XNNPACK, 2)
+                } catch (e: Exception) {
+                    Log.w("TSBIR_BENCHMARK", "XNNPACK test failed: ${e.message}")
+                    Pair(-1L, -1L)
+                }
+
+                val provReport = """
+                    ================== EXECUTION PROVIDER COMPARISON (Text-Only) ==================
+                    Provider Config                  | Cold Start (ms) | Warm / Steady (ms) | Notes
+                    -----------------------------------------------------------------------------------------
+                    AUTO_NNAPI (2 threads)           | ${coldNnapi} ms         | ${warmNnapi} ms           | HW Accelerated (Driver JIT on cold)
+                    CPU_ONLY (2 threads)             | ${coldCpu2} ms         | ${warmCpu2} ms           | Predictable latency, no JIT compile
+                    CPU_ONLY (4 threads)             | ${coldCpu4} ms         | ${warmCpu4} ms           | Higher CPU load / thermals
+                    XNNPACK (2 threads)              | ${coldXnnpack} ms         | ${warmXnnpack} ms           | ${if (coldXnnpack > 0) "Optimized FP/INT kernels" else "Unsupported / Fallback"}
+                    =========================================================================================
+                """.trimIndent()
+                Log.i("TSBIR_BENCHMARK", "\n" + provReport)
+
+                // Part 2: Modalities Profiling on Active Provider (AUTO_NNAPI)
+                Log.i("TSBIR_BENCHMARK", "Warming up interactive sessions on NNAPI...")
+                modelManager.providerPreference = ModelManager.ProviderPreference.AUTO_NNAPI
+                modelManager.interactiveThreads = 2
+                modelManager.warmupSearchSessions()
+
+                val index = getOrBuildMemoryIndex()
+                Log.i("TSBIR_BENCHMARK", "In-memory index ready with ${index.count} photos.")
+
+                val dummyBitmap = Bitmap.createBitmap(224, 224, Bitmap.Config.ARGB_8888)
+                val dummyText = "photo of a dog running on the beach"
+
+                // 1. Warm Text-only search
+                val tTx0 = System.nanoTime()
+                val textEmb = modelManager.encodeText(dummyText)
+                val tTextEnc = (System.nanoTime() - tTx0) / 1_000_000
+                val (textResults, tTextScan) = rankGalleryTopK(textEmb, k = TOP_K)
+                val tTextTotal = tTextEnc + tTextScan
+
+                // 2. Warm Sketch-only search
+                val tSk0 = System.nanoTime()
+                val sketchEmb = modelManager.encodeSketch(dummyBitmap)
+                val tSketchEnc = (System.nanoTime() - tSk0) / 1_000_000
+                val (sketchResults, tSketchScan) = rankGalleryTopK(sketchEmb, k = TOP_K)
+                val tSketchTotal = tSketchEnc + tSketchScan
+
+                // 3. Warm Composite search (Sketch + Text + Fusion)
+                val tComp0 = System.nanoTime()
+                val tSkEnc0 = System.nanoTime()
+                val cSketchEmb = modelManager.encodeSketch(dummyBitmap)
+                val tCompSketchEnc = (System.nanoTime() - tSkEnc0) / 1_000_000
+
+                val tTxEnc0 = System.nanoTime()
+                val cTextEmb = modelManager.encodeText(dummyText)
+                val tCompTextEnc = (System.nanoTime() - tTxEnc0) / 1_000_000
+
+                val tFu0 = System.nanoTime()
+                val fusedEmb = modelManager.fuseComposite(cSketchEmb, cTextEmb)
+                val tFusionMs = (System.nanoTime() - tFu0) / 1_000_000
+
+                val (compResults, tCompScan) = rankGalleryTopK(fusedEmb, k = TOP_K)
+                val tCompTotal = (System.nanoTime() - tComp0) / 1_000_000
+
+                // 4. Warm Refinement (Combiner)
+                val tRef0 = System.nanoTime()
+                val shownCand = if (compResults.isNotEmpty()) compResults[0].embedding else FloatArray(512)
+                val refinedEmb = modelManager.refineFeedback(shownCand, textEmb)
+                val tCombinerMs = (System.nanoTime() - tRef0) / 1_000_000
+                val tRerank0 = System.nanoTime()
+                val reranked = compResults.drop(1).map {
+                    it.copy(score = modelManager.cosineSimilarity(refinedEmb, it.embedding))
+                }.sortedByDescending { it.score }
+                val tRerankMs = (System.nanoTime() - tRerank0) / 1_000_000
+                val tRefineTotal = tCombinerMs + tRerankMs
+
+                val ratioStr = String.format("%.2f", tCompTotal.toDouble() / maxOf(1L, tTextTotal))
+                val modalitiesReport = """
+                    ================== STAGE-BY-STAGE MODALITY LATENCY PROFILING ==================
+                    Search Modality       | Stage Breakdown                                 | Total (ms)
+                    ---------------------------------------------------------------------------------
+                    Text-Only             | Encode: ${tTextEnc}ms | Vector Scan: ${tTextScan}ms         | ${tTextTotal} ms
+                    Sketch-Only           | Encode: ${tSketchEnc}ms | Vector Scan: ${tSketchScan}ms         | ${tSketchTotal} ms
+                    Composite (Text+Sk)   | Sk: ${tCompSketchEnc}ms | Tx: ${tCompTextEnc}ms | Fusion: ${tFusionMs}ms | Scan: ${tCompScan}ms | ${tCompTotal} ms
+                    Refine (Combiner)     | Combiner: ${tCombinerMs}ms | Scoped Top-K Rerank: ${tRerankMs}ms       | ${tRefineTotal} ms
+                    =================================================================================
+                    Composite vs Text Ratio: ${ratioStr}x (Historical unoptimized ratio was 23x)
+                    Isolated Fusion Module Latency: ${tFusionMs} ms
+                    =================================================================================
+                """.trimIndent()
+                Log.i("TSBIR_PROFILE", "\n" + modalitiesReport)
+                dummyBitmap.recycle()
+            } finally {
+                SearchCoordinator.isSearchActive = false
+            }
+        }
     }
 }

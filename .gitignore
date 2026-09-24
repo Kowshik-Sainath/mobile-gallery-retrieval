@@ -33,3 +33,20 @@ exported_models/
 *.bin
 *.safetensors
 TASK-former/sketch_jpg/
+
+# Android build outputs & Gradle
+.gradle/
+android_app/.gradle/
+android_app/build/
+android_app/app/build/
+*.apk
+*.aab
+
+# Scratch & Temporary
+scratch/
+*.tmp
+.cache/
+
+android_app/app/build/
+*.apk
+*.jar

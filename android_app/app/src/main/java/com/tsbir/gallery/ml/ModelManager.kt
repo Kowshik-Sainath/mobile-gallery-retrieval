@@ -56,70 +56,223 @@ class ModelManager private constructor(private val context: Context) {
     var executionProvider: String = "Unknown"
         private set
 
-    init {
-        loadAllSessions()
+    enum class ProviderPreference {
+        AUTO_NNAPI,
+        CPU_ONLY,
+        XNNPACK
     }
 
-    private fun createSessionOptions(): OrtSession.SessionOptions {
-        val options = OrtSession.SessionOptions()
-        options.setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
-        options.setIntraOpNumThreads(4)
+    var providerPreference: ProviderPreference = ProviderPreference.AUTO_NNAPI
+    var backgroundThreads: Int = 1
+    var interactiveThreads: Int = 2
 
-        try {
-            // Attempt NNAPI hardware acceleration on ARM NPU/DSP/GPU
-            options.addNnapi()
-            executionProvider = "NNAPI (Hardware Accelerated)"
-            Log.i(TAG, "Hardware acceleration enabled: NNAPI")
-        } catch (e: Exception) {
-            executionProvider = "CPU / XNNPACK"
-            Log.w(TAG, "NNAPI unavailable on this device, falling back to CPU/XNNPACK: ${e.message}")
+    val isLoaded: Boolean
+        get() = photoSession != null && sketchSession != null && textSession != null &&
+                fusionSession != null && combinerSession != null && tokenizer != null
+
+    private fun createSessionForAsset(assetName: String, numThreads: Int): OrtSession {
+        val modelBytes = readAssetBytes(assetName)
+
+        if (providerPreference == ProviderPreference.AUTO_NNAPI) {
+            try {
+                val nnapiOpts = OrtSession.SessionOptions().apply {
+                    setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
+                    setIntraOpNumThreads(numThreads)
+                    addNnapi()
+                }
+                val session = env.createSession(modelBytes, nnapiOpts)
+                executionProvider = "NNAPI (HW Accelerated)"
+                Log.i(TAG, "Loaded $assetName (threads=$numThreads) with NNAPI.")
+                return session
+            } catch (e: Exception) {
+                Log.w(TAG, "NNAPI failed for $assetName (${e.message}), falling back to CPU.")
+            }
+        } else if (providerPreference == ProviderPreference.XNNPACK) {
+            try {
+                val xnnpackOpts = OrtSession.SessionOptions().apply {
+                    setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
+                    setIntraOpNumThreads(numThreads)
+                    addXnnpack(mapOf("intra_op_num_threads" to numThreads.toString()))
+                }
+                val session = env.createSession(modelBytes, xnnpackOpts)
+                executionProvider = "XNNPACK"
+                Log.i(TAG, "Loaded $assetName (threads=$numThreads) with XNNPACK.")
+                return session
+            } catch (e: Exception) {
+                Log.w(TAG, "XNNPACK failed for $assetName (${e.message}), falling back to CPU.")
+            }
         }
 
-        return options
+        // Clean CPU Fallback
+        val cpuOpts = OrtSession.SessionOptions().apply {
+            setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT)
+            setIntraOpNumThreads(numThreads)
+        }
+        val session = env.createSession(modelBytes, cpuOpts)
+        if (executionProvider == "Unknown") {
+            executionProvider = "CPU (threads=$numThreads)"
+        }
+        Log.i(TAG, "Loaded $assetName (threads=$numThreads) on CPU.")
+        return session
     }
 
     @Synchronized
-    fun loadAllSessions() {
-        if (photoSession != null) return
-
-        val opts = createSessionOptions()
-
-        try {
-            Log.i(TAG, "Loading photo_backbone_int8.onnx...")
-            photoSession = env.createSession(readAssetBytes("photo_backbone_int8.onnx"), opts)
-
-            Log.i(TAG, "Loading sketch_encoder_int8.onnx...")
-            sketchSession = env.createSession(readAssetBytes("sketch_encoder_int8.onnx"), opts)
-
-            Log.i(TAG, "Loading text_encoder_int8.onnx...")
-            textSession = env.createSession(readAssetBytes("text_encoder_int8.onnx"), opts)
-
-            Log.i(TAG, "Loading composite_fusion_mobile.onnx...")
-            fusionSession = env.createSession(readAssetBytes("composite_fusion_mobile.onnx"), opts)
-
-            Log.i(TAG, "Loading combiner_mobile.onnx...")
-            combinerSession = env.createSession(readAssetBytes("combiner_mobile.onnx"), opts)
-
-            Log.i(TAG, "Initializing CLIP BPE Tokenizer...")
-            val vocabStream = context.assets.open("bpe_simple_vocab_16e6.txt.gz")
-            tokenizer = ClipTokenizer(vocabStream, isGzipped = true)
-
-            Log.i(TAG, "All 5 ONNX components and Tokenizer loaded successfully. Provider: $executionProvider")
-        } catch (e: Exception) {
-            Log.e(TAG, "Error initializing ONNX models", e)
-            throw RuntimeException("Failed to initialize ONNX sessions: ${e.message}", e)
+    fun ensurePhotoLoaded(threads: Int = backgroundThreads) {
+        if (photoSession == null) {
+            Log.i(TAG, "Lazy loading Photo Backbone (threads=$threads)...")
+            photoSession = createSessionForAsset("photo_backbone_int8.onnx", threads)
         }
     }
 
-    private fun readAssetBytes(assetName: String): ByteArray {
-        context.assets.open(assetName).use { inputStream ->
-            val byteBuffer = ByteArrayOutputStream()
-            val buffer = ByteArray(65536)
-            var bytesRead: Int
-            while (inputStream.read(buffer).also { bytesRead = it } != -1) {
-                byteBuffer.write(buffer, 0, bytesRead)
+    @Synchronized
+    fun ensureSketchLoaded(threads: Int = interactiveThreads) {
+        if (sketchSession == null) {
+            Log.i(TAG, "Lazy loading Sketch Encoder (threads=$threads)...")
+            sketchSession = createSessionForAsset("sketch_encoder_int8.onnx", threads)
+        }
+    }
+
+    @Synchronized
+    fun ensureTextLoaded(threads: Int = interactiveThreads) {
+        if (textSession == null) {
+            Log.i(TAG, "Lazy loading Text Encoder (threads=$threads)...")
+            textSession = createSessionForAsset("text_encoder_int8.onnx", threads)
+        }
+        if (tokenizer == null) {
+            Log.i(TAG, "Initializing CLIP Tokenizer...")
+            val (vocabStream, isGz) = try {
+                context.assets.open("bpe_simple_vocab_16e6.txt") to false
+            } catch (e: Exception) {
+                context.assets.open("bpe_simple_vocab_16e6.txt.gz") to true
             }
-            return byteBuffer.toByteArray()
+            tokenizer = ClipTokenizer(vocabStream, isGzipped = isGz)
+        }
+    }
+
+    @Synchronized
+    fun ensureFusionLoaded(threads: Int = interactiveThreads) {
+        if (fusionSession == null) {
+            Log.i(TAG, "Lazy loading Multimodal Fusion (threads=$threads)...")
+            fusionSession = createSessionForAsset("composite_fusion_mobile.onnx", threads)
+        }
+    }
+
+    @Synchronized
+    fun ensureCombinerLoaded(threads: Int = interactiveThreads) {
+        if (combinerSession == null) {
+            Log.i(TAG, "Lazy loading Feedback Combiner (threads=$threads)...")
+            combinerSession = createSessionForAsset("combiner_mobile.onnx", threads)
+        }
+    }
+
+    @Synchronized
+    fun resetInteractiveSessions() {
+        try { sketchSession?.close() } catch (e: Exception) {}
+        sketchSession = null
+        try { textSession?.close() } catch (e: Exception) {}
+        textSession = null
+        try { fusionSession?.close() } catch (e: Exception) {}
+        fusionSession = null
+        try { combinerSession?.close() } catch (e: Exception) {}
+        combinerSession = null
+        executionProvider = "Unknown"
+        Log.i(TAG, "Interactive search sessions closed and reset.")
+    }
+
+    @Synchronized
+    fun resetAllSessions() {
+        resetInteractiveSessions()
+        try { photoSession?.close() } catch (e: Exception) {}
+        photoSession = null
+        Log.i(TAG, "All ONNX sessions closed and reset.")
+    }
+
+    /**
+     * Warms up all 4 interactive search sessions (Text, Sketch, Fusion, Combiner)
+     * in the background by loading them and executing one dummy forward pass.
+     * This eliminates the ~4-5s cold compilation pause when the user taps search.
+     */
+    fun warmupSearchSessions() {
+        try {
+            Log.i(TAG, "Starting background search sessions warmup...")
+            val t0 = System.nanoTime()
+
+            // 1. Text Session + Tokenizer
+            val tTx0 = System.nanoTime()
+            ensureTextLoaded(interactiveThreads)
+            encodeText("warmup query photo")
+            val tText = (System.nanoTime() - tTx0) / 1_000_000
+            Log.i(TAG, "Text session warmed up in ${tText}ms")
+
+            // 2. Sketch Session
+            val tSk0 = System.nanoTime()
+            ensureSketchLoaded(interactiveThreads)
+            val dummyBmp = Bitmap.createBitmap(224, 224, Bitmap.Config.ARGB_8888)
+            val sketchEmb = encodeSketch(dummyBmp)
+            dummyBmp.recycle()
+            val tSketch = (System.nanoTime() - tSk0) / 1_000_000
+            Log.i(TAG, "Sketch session warmed up in ${tSketch}ms")
+
+            // 3. Multimodal Fusion
+            val tFu0 = System.nanoTime()
+            ensureFusionLoaded(interactiveThreads)
+            val dummyVec = FloatArray(EMBED_DIM)
+            val fused = fuseComposite(sketchEmb, dummyVec)
+            val tFusion = (System.nanoTime() - tFu0) / 1_000_000
+            Log.i(TAG, "Fusion session warmed up in ${tFusion}ms")
+
+            // 4. Feedback Combiner
+            val tCb0 = System.nanoTime()
+            ensureCombinerLoaded(interactiveThreads)
+            refineFeedback(fused, fused)
+            val tCombiner = (System.nanoTime() - tCb0) / 1_000_000
+            Log.i(TAG, "Combiner session warmed up in ${tCombiner}ms")
+
+            val total = (System.nanoTime() - t0) / 1_000_000
+            Log.i(TAG, "All interactive search sessions warm and ready in ${total}ms (Provider: $executionProvider)")
+        } catch (e: Exception) {
+            Log.w(TAG, "Warmup error: ${e.message}", e)
+        }
+    }
+
+    /**
+     * Isolated single-configuration text encoder benchmark:
+     * Measures Cold latency (session creation + first inference pass)
+     * and Warm latency (mean of 3 subsequent inference passes).
+     */
+    fun benchmarkTextProvider(preference: ProviderPreference, threads: Int): Pair<Long, Long> {
+        resetInteractiveSessions()
+        System.gc()
+        Thread.sleep(400)
+
+        providerPreference = preference
+        val tCold0 = System.nanoTime()
+        ensureTextLoaded(threads)
+        val dummyText = "a photo of a cat sitting on a couch"
+        encodeText(dummyText)
+        val coldMs = (System.nanoTime() - tCold0) / 1_000_000
+
+        var warmSum = 0L
+        val warmRuns = 3
+        for (i in 0 until warmRuns) {
+            val t0 = System.nanoTime()
+            encodeText(dummyText)
+            warmSum += (System.nanoTime() - t0) / 1_000_000
+        }
+        val warmMs = warmSum / warmRuns
+
+        val detectedEp = executionProvider
+        resetInteractiveSessions()
+        System.gc()
+        Thread.sleep(400)
+
+        Log.i(TAG, "Benchmark [$preference, threads=$threads] -> EP: $detectedEp | Cold: ${coldMs}ms | Warm: ${warmMs}ms")
+        return Pair(coldMs, warmMs)
+    }
+
+    private fun readAssetBytes(assetName: String): ByteArray {
+        return context.assets.open(assetName).use { inputStream ->
+            inputStream.readBytes()
         }
     }
 
@@ -167,6 +320,7 @@ class ModelManager private constructor(private val context: Context) {
      * Encodes a gallery photo into a 512-D L2-normalized float32 embedding.
      */
     fun encodePhoto(bitmap: Bitmap): FloatArray {
+        ensurePhotoLoaded()
         val session = photoSession ?: throw IllegalStateException("photoSession not loaded")
         val floatBuffer = preprocessBitmap(bitmap)
         val shape = longArrayOf(1, 3, 224, 224)
@@ -185,6 +339,7 @@ class ModelManager private constructor(private val context: Context) {
      * Encodes a sketch image into a 512-D L2-normalized float32 embedding.
      */
     fun encodeSketch(bitmap: Bitmap): FloatArray {
+        ensureSketchLoaded()
         val session = sketchSession ?: throw IllegalStateException("sketchSession not loaded")
         val floatBuffer = preprocessBitmap(bitmap)
         val shape = longArrayOf(1, 3, 224, 224)
@@ -203,6 +358,7 @@ class ModelManager private constructor(private val context: Context) {
      * Encodes a text query string into a 512-D L2-normalized float32 embedding.
      */
     fun encodeText(text: String): FloatArray {
+        ensureTextLoaded()
         val session = textSession ?: throw IllegalStateException("textSession not loaded")
         val tok = tokenizer ?: throw IllegalStateException("tokenizer not loaded")
 
@@ -223,6 +379,7 @@ class ModelManager private constructor(private val context: Context) {
      * Multimodal Composite Fusion: Fuses sketch (512) and text (512) embeddings into a single query.
      */
     fun fuseComposite(sketchEmb: FloatArray, textEmb: FloatArray): FloatArray {
+        ensureFusionLoaded()
         val session = fusionSession ?: throw IllegalStateException("fusionSession not loaded")
 
         val sketchTensor = OnnxTensor.createTensor(
@@ -251,6 +408,7 @@ class ModelManager private constructor(private val context: Context) {
      * Takes (shown_candidate_embed, refined_query_embed) -> outputs new composed query embedding.
      */
     fun refineFeedback(shownCandidateEmb: FloatArray, refinedQueryEmb: FloatArray): FloatArray {
+        ensureCombinerLoaded()
         val session = combinerSession ?: throw IllegalStateException("combinerSession not loaded")
 
         val candidateTensor = OnnxTensor.createTensor(

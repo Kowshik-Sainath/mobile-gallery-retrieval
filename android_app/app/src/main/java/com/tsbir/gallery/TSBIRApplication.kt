@@ -23,15 +23,8 @@ class TSBIRApplication : Application() {
         super.onCreate()
         Log.i(TAG, "Initializing T+SBIR Mobile Gallery Application...")
 
-        // Warm up ONNX Runtime models asynchronously in background
-        appScope.launch {
-            try {
-                ModelManager.getInstance(this@TSBIRApplication)
-                Log.i(TAG, "ONNX Runtime model manager initialized.")
-            } catch (e: Exception) {
-                Log.e(TAG, "Background model initialization failed: ${e.message}", e)
-            }
-        }
+        // Do not eagerly load all 5 ONNX models at startup (saves ~300MB RAM and thermal contention).
+        // Models are loaded lazily on demand per modality when needed.
 
         // Schedule periodic background indexing (Doze-safe)
         GalleryIndexWorker.schedulePeriodic(this)
