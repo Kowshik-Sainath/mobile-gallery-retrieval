@@ -14,9 +14,14 @@ env/
 # Datasets
 CUHK-PEDES/
 fscoco/
+CSTBIR/data/CSTBIR_dataset.json
+CSTBIR/data/vg_images/
+CSTBIR/data/quickdraw_sketches/
+CSTBIR/data/sketches/
 
 # Large datasets / archives
 *.zip
+!CSTBIR/checkpoints/training_history.json
 
 # Model checkpoints
 checkpoints/

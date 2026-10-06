@@ -1,0 +1,25 @@
+model:
+  clip_model_name: 'ViT-B/16'
+  num_classes: 258
+  learning_rate: 1e-5
+  batch_size: 8
+  optimizer: 'adam'
+  weight_decay: 1e-4
+
+data:
+  dataset_json_path: 'CSTBIR/data/CSTBIR_dataset.json'
+  classes_path: 'CSTBIR/data/classes_258.json'
+  images_dir: 'CSTBIR/data/vg_images'
+  sketches_dir: 'CSTBIR/data/quickdraw_sketches'
+  sketch_embeddings_path: 'CSTBIR/data/sketch_embeddings.pt'
+  train_split: 'train'
+  val_split: 'val'
+  test_split: 'test'
+
+training:
+  epochs: 3
+  steps_per_epoch: 100
+  save_dir: 'CSTBIR/checkpoints'
+  log_interval: 20
+  eval_interval: 1
+  gradient_clip: 1.0
