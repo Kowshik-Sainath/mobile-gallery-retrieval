@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">T+SBIR Mobile Gallery</string>
+    <string name="search_hint">Enter text description (e.g. brown dog on grass)...</string>
+    <string name="tab_all">Both (Multimodal)</string>
+    <string name="tab_text">Text Only</string>
+    <string name="tab_sketch">Sketch Only</string>
+    <string name="action_search">Search Gallery</string>
+    <string name="action_clear">Clear</string>
+    <string name="action_undo">Undo</string>
+    <string name="action_erase">Eraser</string>
+    <string name="action_draw">Pencil</string>
+    <string name="refine_title">Refine Retrieval Results</string>
+    <string name="refine_prompt">What is different about what you are looking for?</string>
+    <string name="action_submit_refine">Submit Feedback</string>
+    <string name="status_indexing">Indexing device gallery...</string>
+    <string name="status_indexed">%1$d photos indexed</string>
+    <string name="status_ready">Gallery ready</string>
+    <string name="reject_button">Reject &amp; Refine</string>
+</resources>

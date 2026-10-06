@@ -1,0 +1,6 @@
+## Location of the Android SDK.
+## Android Studio will set this automatically when opening the project.
+## If building from the command line, ensure this path points to your Android SDK:
+# sdk.dir=C\:\\Users\\reddy\\AppData\\Local\\Android\\Sdk
+# Or on macOS/Linux:
+# sdk.dir=/Users/username/Library/Android/sdk
