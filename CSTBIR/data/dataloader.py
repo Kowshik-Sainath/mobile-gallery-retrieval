@@ -59,7 +59,21 @@ class CSTBIRDataset(Dataset):
         self.images_dir = images_dir
         self.sketches_dir = sketches_dir
         self.sketch_embeddings_dict = sketch_embeddings_dict
-        self.vg_boxes_dict = vg_boxes_dict or {}
+        # Load VG Bounding Boxes dictionary (real Visual Genome spatial annotations)
+        if isinstance(vg_boxes_dict, str) and os.path.exists(vg_boxes_dict):
+            print(f"[CSTBIRDataset] Loading real VG bounding boxes from {vg_boxes_dict}...")
+            with open(vg_boxes_dict, 'r', encoding='utf-8') as f:
+                self.vg_boxes_dict = json.load(f)
+        elif vg_boxes_dict is not None and len(vg_boxes_dict) > 0:
+            self.vg_boxes_dict = vg_boxes_dict
+        else:
+            default_boxes_path = os.path.join(os.path.dirname(__file__), "vg_boxes.json")
+            if os.path.exists(default_boxes_path):
+                print(f"[CSTBIRDataset] Auto-loading real VG bounding boxes from {default_boxes_path}...")
+                with open(default_boxes_path, 'r', encoding='utf-8') as f:
+                    self.vg_boxes_dict = json.load(f)
+            else:
+                self.vg_boxes_dict = {}
         
         # Default CLIP and Sketch Preprocessors
         self.preprocess = preprocess or transforms.Compose([
@@ -173,7 +187,16 @@ class CSTBIRDataset(Dataset):
             target_sketch = torch.zeros(1, 224, 224)
             
         # 4. Bounding box for L_OD: [x_min, y_min, x_max, y_max] normalized in [0, 1]
-        bbox = self.vg_boxes_dict.get(img_name, [0.25, 0.25, 0.75, 0.75])
+        # Query-specific object match: check (img_name, label_str) first, then image fallback
+        key_pair = f"{img_name}_{label_str}"
+        if key_pair in self.vg_boxes_dict:
+            bbox = self.vg_boxes_dict[key_pair]
+        elif (img_name, label_str) in self.vg_boxes_dict:
+            bbox = self.vg_boxes_dict[(img_name, label_str)]
+        elif img_name in self.vg_boxes_dict:
+            bbox = self.vg_boxes_dict[img_name]
+        else:
+            bbox = [0.25, 0.25, 0.75, 0.75]
         bbox_tensor = torch.tensor(bbox, dtype=torch.float32)
         
         return {

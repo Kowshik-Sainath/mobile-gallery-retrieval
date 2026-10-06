@@ -36,11 +36,13 @@ def train_stnet(config_path: str = "CSTBIR/configs/stnet_train.yaml"):
     
     # 2. Datasets
     json_path = cfg["data"]["dataset_json_path"]
+    vg_boxes_path = cfg["data"].get("vg_boxes_path", "CSTBIR/data/vg_boxes.json")
     train_ds = CSTBIRDataset(
         json_path=json_path,
         split=cfg["data"]["train_split"],
         images_dir=cfg["data"]["images_dir"],
         sketches_dir=cfg["data"]["sketches_dir"],
+        vg_boxes_dict=vg_boxes_path,
         classes_path=cfg["data"]["classes_path"]
     )
     
@@ -49,6 +51,7 @@ def train_stnet(config_path: str = "CSTBIR/configs/stnet_train.yaml"):
         split=cfg["data"]["val_split"],
         images_dir=cfg["data"]["images_dir"],
         sketches_dir=cfg["data"]["sketches_dir"],
+        vg_boxes_dict=vg_boxes_path,
         classes_path=cfg["data"]["classes_path"]
     )
     

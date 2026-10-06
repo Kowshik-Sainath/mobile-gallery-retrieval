@@ -11,6 +11,7 @@ data:
   classes_path: 'CSTBIR/data/classes_258.json'
   images_dir: 'CSTBIR/data/vg_images'
   sketches_dir: 'CSTBIR/data/quickdraw_sketches'
+  vg_boxes_path: 'CSTBIR/data/vg_boxes.json'
   sketch_embeddings_path: 'CSTBIR/data/sketch_embeddings.pt'
   train_split: 'train'
   val_split: 'val'
