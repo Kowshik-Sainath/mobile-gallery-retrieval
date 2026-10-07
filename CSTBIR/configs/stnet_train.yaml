@@ -8,6 +8,7 @@ model:
 
 data:
   dataset_json_path: 'CSTBIR/data/CSTBIR_dataset.json'
+  train_json_path: 'CSTBIR/data/train_subset_5k_stratified.json'
   classes_path: 'CSTBIR/data/classes_258.json'
   images_dir: 'CSTBIR/data/vg_images'
   sketches_dir: 'CSTBIR/data/quickdraw_sketches'

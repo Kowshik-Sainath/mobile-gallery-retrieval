@@ -24,7 +24,7 @@ CSTBIR/data/sketches/
 !CSTBIR/checkpoints/training_history.json
 
 # Model checkpoints
-checkpoints/
+/checkpoints/
 exported_models/
 
 # Environment / secrets

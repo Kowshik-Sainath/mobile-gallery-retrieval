@@ -2,7 +2,7 @@ import os
 import sys
 import json
 import time
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import torch
@@ -22,7 +22,8 @@ def evaluate_split(
     dataset_json: str = "CSTBIR/data/CSTBIR_dataset.json",
     images_dir: str = "CSTBIR/data/vg_images",
     sketches_dir: str = "CSTBIR/data/quickdraw_sketches",
-    batch_size: int = 64
+    batch_size: int = 64,
+    gallery_manifest: Optional[str] = None
 ) -> Dict[str, float]:
     device = model.device
     model.eval()
@@ -35,17 +36,45 @@ def evaluate_split(
         data = json.load(f)
         
     queries = [x for x in data if x.get("split") == split_name]
-    print(f"Total queries in '{split_name}': {len(queries)}")
+    print(f"Total raw queries in '{split_name}': {len(queries)}")
     
-    # 1. Unique Gallery Images
-    gallery_image_names = sorted(list(set(x["image"] for x in queries)))
+    # 0. Strict Media Validation: Drop any query with missing/corrupt media (no zero-filling)
+    valid_queries = []
+    for q in queries:
+        ip = os.path.join(images_dir, q["image"])
+        sp = os.path.join(sketches_dir, q["sketch"])
+        if (os.path.exists(ip) and os.path.getsize(ip) > 1000 and
+            os.path.exists(sp) and os.path.getsize(sp) > 1000):
+            valid_queries.append(q)
+        else:
+            print(f"[Eval Warning] Dropping query with invalid/missing media: img={q['image']}, sk={q['sketch']}")
+            
+    queries = valid_queries
+    print(f"Total media-verified queries in '{split_name}': {len(queries)}")
+    
+    # 1. Unique Gallery Images (from manifest if provided, else unique query targets)
+    if gallery_manifest and os.path.exists(gallery_manifest):
+        print(f"Loading custom gallery manifest from {gallery_manifest}...")
+        with open(gallery_manifest, "r", encoding="utf-8") as gf:
+            gallery_image_names = json.load(gf)
+    else:
+        gallery_image_names = sorted(list(set(x["image"] for x in queries)))
+        
+    # Verify every gallery image exists with real data (>1000B)
+    for name in gallery_image_names:
+        p = os.path.join(images_dir, name)
+        if not (os.path.exists(p) and os.path.getsize(p) > 1000):
+            raise RuntimeError(f"Gallery image missing or corrupted: {p}! Evaluation cannot use zero tensors.")
+            
     K = len(gallery_image_names)
     img_to_idx = {name: i for i, name in enumerate(gallery_image_names)}
-    print(f"Total unique gallery images: {K}")
+    print(f"Total unique verified gallery images: {K}")
     
-    # Ground-truth gallery index for each query
+    # Filter queries whose ground truth image is in gallery
+    queries = [q for q in queries if q["image"] in img_to_idx]
     gt_indices = [img_to_idx[q["image"]] for q in queries]
     Q = len(queries)
+    print(f"Active evaluated queries: {Q}")
     
     # Preprocessors
     clip_preprocess = transforms.Compose([
@@ -70,11 +99,8 @@ def evaluate_split(
         batch_imgs = []
         for name in batch_names:
             p = os.path.join(images_dir, name)
-            if os.path.exists(p):
-                with Image.open(p) as img:
-                    batch_imgs.append(clip_preprocess(img.convert("RGB")))
-            else:
-                batch_imgs.append(torch.zeros(3, 224, 224))
+            with Image.open(p) as img:
+                batch_imgs.append(clip_preprocess(img.convert("RGB")))
                 
         img_tensors = torch.stack(batch_imgs).to(device)
         with torch.no_grad():
@@ -101,11 +127,8 @@ def evaluate_split(
         batch_sks = []
         for q in batch_q:
             sp = os.path.join(sketches_dir, q["sketch"])
-            if os.path.exists(sp):
-                with Image.open(sp) as img:
-                    batch_sks.append(sketch_preprocess(img.convert("RGB")))
-            else:
-                batch_sks.append(torch.zeros(3, 224, 224))
+            with Image.open(sp) as img:
+                batch_sks.append(sketch_preprocess(img.convert("RGB")))
                 
         sk_tensors = torch.stack(batch_sks).to(device)
         
@@ -192,8 +215,13 @@ def run_table3_evaluation(model_path: str = None):
     # Evaluate Test-1K
     metrics_1k = evaluate_split(model, split_name="val")
     
-    # Evaluate Test-5K
-    metrics_5k = evaluate_split(model, split_name="test")
+    # Evaluate Test-5K (use official 5,000-image gallery if available)
+    gallery_5k_manifest = "CSTBIR/data/test5k_gallery_5000.json"
+    if os.path.exists(gallery_5k_manifest):
+        print(f"\nUsing canonical 5,000-image gallery for Test-5K ({gallery_5k_manifest})...")
+        metrics_5k = evaluate_split(model, split_name="test", gallery_manifest=gallery_5k_manifest)
+    else:
+        metrics_5k = evaluate_split(model, split_name="test")
     
     # Print Table 3 Comparison
     print("\n" + "=" * 80)

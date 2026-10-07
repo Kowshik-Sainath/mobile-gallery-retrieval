@@ -61,9 +61,10 @@ def train_stnet(
     
     # 2. Datasets
     json_path = cfg["data"]["dataset_json_path"]
+    train_json_path = cfg["data"].get("train_json_path", json_path)
     vg_boxes_path = cfg["data"].get("vg_boxes_path", "CSTBIR/data/vg_boxes.json")
     train_ds = CSTBIRDataset(
-        json_path=json_path,
+        json_path=train_json_path,
         split=cfg["data"]["train_split"],
         images_dir=cfg["data"]["images_dir"],
         sketches_dir=cfg["data"]["sketches_dir"],
