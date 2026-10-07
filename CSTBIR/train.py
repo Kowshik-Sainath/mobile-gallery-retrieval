@@ -2,9 +2,11 @@ import sys
 import os
 import yaml
 import time
+import random
 import argparse
-from typing import Dict, List
+from typing import Dict, List, Optional, Tuple, Any
 
+import numpy as np
 import torch
 import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
@@ -15,15 +17,38 @@ from CSTBIR.models.stnet import STNet
 from CSTBIR.data.dataloader import CSTBIRDataset
 from CSTBIR.evaluate_retrieval import evaluate_gallery_ranking
 
-def train_stnet(config_path: str = "CSTBIR/configs/stnet_train.yaml"):
+def set_seed(seed: int = 42):
+    """Fix random seeds for 100% reproducible training and batch sampling."""
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+
+def train_stnet(
+    config_path: str = "CSTBIR/configs/stnet_train.yaml",
+    lambda_od: float = 1.0,
+    seed: int = 42,
+    run_name: Optional[str] = None
+) -> Tuple[Dict[str, List[float]], str]:
+    # 0. Set seed for deterministic initialization & batch sequences
+    set_seed(seed)
+    batch_rng = random.Random(seed)
+    
     with open(config_path, "r", encoding="utf-8") as f:
         cfg = yaml.safe_load(f)
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
+    print(f"\n" + "=" * 70)
     print(f"=== STNet Training (AAAI 2024 Reimplementation) ===")
-    print(f"Device: {device}")
+    print(f"Run Name:  {run_name if run_name else 'default'}")
+    print(f"lambda_od: {lambda_od} | Seed: {seed} | Device: {device}")
+    print("=" * 70)
     
-    save_dir = cfg["training"]["save_dir"]
+    base_save_dir = cfg["training"]["save_dir"]
+    save_dir = os.path.join(base_save_dir, run_name) if run_name else base_save_dir
     os.makedirs(save_dir, exist_ok=True)
 
     # 1. Initialize Model
@@ -72,17 +97,19 @@ def train_stnet(config_path: str = "CSTBIR/configs/stnet_train.yaml"):
     print(f"Optimizer: Adam | Base LR: {learning_rate} | Batch Size: {batch_size} | Epochs: {epochs}")
     print(f"Training split queries: {len(train_ds)} | Test-1K queries: {len(val_ds)}")
     
-    # History logs for all 5 loss terms
+    # History logs for all loss terms
     history = {
         'loss_total': [],
         'loss_ct': [],
         'loss_cls_t': [],
         'loss_cls_i': [],
         'loss_od': [],
+        'loss_od_weighted': [],
         'loss_sr': []
     }
     
     steps_per_epoch = cfg["training"].get("steps_per_epoch", min(len(train_ds) // batch_size, 1000))
+    best_ckpt_path = os.path.join(save_dir, "stnet_best.pt")
     
     for epoch in range(epochs):
         model.train()
@@ -90,7 +117,7 @@ def train_stnet(config_path: str = "CSTBIR/configs/stnet_train.yaml"):
         pbar = tqdm(range(steps_per_epoch), desc=f"Epoch {epoch+1}/{epochs}")
         
         for step in pbar:
-            batch = train_ds.get_conflict_free_batch(batch_size=batch_size)
+            batch = train_ds.get_conflict_free_batch(batch_size=batch_size, rng=batch_rng)
             
             text_tokens = batch['text'].to(device)
             images = batch['image'].to(device)
@@ -109,7 +136,8 @@ def train_stnet(config_path: str = "CSTBIR/configs/stnet_train.yaml"):
                 sketch_embeds=sketch_embeds,
                 gt_boxes=gt_boxes,
                 gt_labels=gt_labels,
-                target_sketch_imgs=target_sketches
+                target_sketch_imgs=target_sketches,
+                lambda_od=lambda_od
             )
             
             loss_total = outputs['loss_total']
@@ -138,13 +166,14 @@ def train_stnet(config_path: str = "CSTBIR/configs/stnet_train.yaml"):
             avg_loss = epoch_losses[k] / steps_per_epoch
             history[k].append(avg_loss)
             
-        print(f"\n[Epoch {epoch+1}/{epochs} Summary]")
-        print(f"  L_total: {history['loss_total'][-1]:.4f}")
-        print(f"  L_CT:    {history['loss_ct'][-1]:.4f}")
-        print(f"  L_CLS^T: {history['loss_cls_t'][-1]:.4f}")
-        print(f"  L_CLS^I: {history['loss_cls_i'][-1]:.4f}")
-        print(f"  L_OD:    {history['loss_od'][-1]:.4f}")
-        print(f"  L_SR:    {history['loss_sr'][-1]:.4f}")
+        print(f"\n[Epoch {epoch+1}/{epochs} Summary (lambda_od={lambda_od})]")
+        print(f"  L_total:     {history['loss_total'][-1]:.4f}")
+        print(f"  L_CT:        {history['loss_ct'][-1]:.4f}")
+        print(f"  L_CLS^T:     {history['loss_cls_t'][-1]:.4f}")
+        print(f"  L_CLS^I:     {history['loss_cls_i'][-1]:.4f}")
+        print(f"  L_OD (raw):  {history['loss_od'][-1]:.4f}")
+        print(f"  L_OD (wtd):  {history['loss_od_weighted'][-1]:.4f}")
+        print(f"  L_SR:        {history['loss_sr'][-1]:.4f}")
         
         # Save epoch checkpoint
         ckpt_path = os.path.join(save_dir, f"stnet_epoch_{epoch+1}.pt")
@@ -152,18 +181,21 @@ def train_stnet(config_path: str = "CSTBIR/configs/stnet_train.yaml"):
             'epoch': epoch + 1,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
-            'history': history
+            'history': history,
+            'lambda_od': lambda_od,
+            'seed': seed
         }, ckpt_path)
         print(f"Checkpoint saved to {ckpt_path}")
         
         # Save best model based on contrastive retrieval loss (L_CT)
         if history['loss_ct'][-1] == min(history['loss_ct']):
-            best_ckpt_path = os.path.join(save_dir, "stnet_best.pt")
             torch.save({
                 'epoch': epoch + 1,
                 'model_state_dict': model.state_dict(),
                 'optimizer_state_dict': optimizer.state_dict(),
-                'history': history
+                'history': history,
+                'lambda_od': lambda_od,
+                'seed': seed
             }, best_ckpt_path)
             print(f"  * New best L_CT ({history['loss_ct'][-1]:.4f})! Saved to {best_ckpt_path}")
             
@@ -173,7 +205,14 @@ def train_stnet(config_path: str = "CSTBIR/configs/stnet_train.yaml"):
         with open(history_path, "w", encoding="utf-8") as hf:
             json.dump(history, hf, indent=2)
             
-    print("\nTraining completed successfully.")
+    print(f"\nTraining completed successfully for {run_name if run_name else 'default'}.")
+    return history, best_ckpt_path
 
 if __name__ == "__main__":
-    train_stnet()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--config", default="CSTBIR/configs/stnet_train.yaml")
+    parser.add_argument("--lambda_od", type=float, default=1.0)
+    parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--run_name", type=str, default=None)
+    args = parser.parse_args()
+    train_stnet(config_path=args.config, lambda_od=args.lambda_od, seed=args.seed, run_name=args.run_name)

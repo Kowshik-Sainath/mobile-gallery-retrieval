@@ -107,7 +107,8 @@ class STNet(nn.Module):
         sketch_embeds: Optional[torch.Tensor] = None, # (B, 768)
         gt_boxes: Optional[torch.Tensor] = None,       # (B, 4) [x_min, y_min, x_max, y_max]
         gt_labels: Optional[torch.Tensor] = None,      # (B,) category index in [0, C-1]
-        target_sketch_imgs: Optional[torch.Tensor] = None # (B, 1, 224, 224) for L_SR
+        target_sketch_imgs: Optional[torch.Tensor] = None, # (B, 1, 224, 224) for L_SR
+        lambda_od: float = 1.0
     ) -> Dict[str, torch.Tensor]:
         B = text_tokens.shape[0]
         
@@ -149,7 +150,11 @@ class STNet(nn.Module):
         # Loss 4: L_OD (Object Detection)
         if gt_boxes is not None and gt_labels is not None:
             gt_od_grid = build_yolo_target(gt_boxes, gt_labels, grid_size=7, num_classes=self.num_classes, device=self.device)
-            loss_od = self.loss_od_fn(pred_od_grid, gt_od_grid)
+            if lambda_od > 0.0:
+                loss_od = self.loss_od_fn(pred_od_grid, gt_od_grid)
+            else:
+                with torch.no_grad():
+                    loss_od = self.loss_od_fn(pred_od_grid, gt_od_grid)
         else:
             loss_od = torch.tensor(0.0, device=self.device)
             
@@ -159,8 +164,11 @@ class STNet(nn.Module):
         else:
             loss_sr = torch.tensor(0.0, device=self.device)
             
-        # Total Loss: Unweighted sum per paper
-        total_loss = loss_ct + loss_cls_t + loss_cls_i + loss_od + loss_sr
+        # Total Loss: Controlled by lambda_od
+        if lambda_od > 0.0:
+            total_loss = loss_ct + loss_cls_t + loss_cls_i + (lambda_od * loss_od) + loss_sr
+        else:
+            total_loss = loss_ct + loss_cls_t + loss_cls_i + loss_sr
         
         return {
             'loss_total': total_loss,
@@ -169,6 +177,7 @@ class STNet(nn.Module):
             'loss_cls_i': loss_cls_i,
             'loss_cls': loss_cls,
             'loss_od': loss_od,
+            'loss_od_weighted': (lambda_od * loss_od) if lambda_od > 0.0 else torch.tensor(0.0, device=self.device),
             'loss_sr': loss_sr,
             'h_T_CLS': h_T_CLS,
             'h_I_AVG': h_I_AVG,

@@ -212,11 +212,12 @@ class CSTBIRDataset(Dataset):
             'raw_text': text_str
         }
 
-    def get_conflict_free_batch(self, batch_size: int) -> dict:
+    def get_conflict_free_batch(self, batch_size: int, rng: Optional[random.Random] = None) -> dict:
         """
         Samples a batch where no two queries share the same image or text,
         matching conditional sampling described in Section: STNET Training.
         """
+        rand_fn = rng.randint if rng is not None else random.randint
         selected_indices = []
         selected_images = set()
         selected_texts = set()
@@ -225,7 +226,7 @@ class CSTBIRDataset(Dataset):
         max_attempts = batch_size * 50
         while len(selected_indices) < batch_size and attempts < max_attempts:
             attempts += 1
-            idx = random.randint(0, len(self.samples) - 1)
+            idx = rand_fn(0, len(self.samples) - 1)
             img = self.samples[idx]['image']
             txt = self.samples[idx]['text']
             
