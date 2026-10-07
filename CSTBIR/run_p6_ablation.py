@@ -101,7 +101,7 @@ def run_ablation():
     print("\n" + "=" * 90)
     print("PART P-6: ABLATION RESULTS SUMMARY (TEST-1K)")
     print("=" * 90)
-    print(f"{'Metric':<10} | {'Published':>10} | {'Zero-Shot':>10} | {'Bugged Bbox':>12} | {'λ_OD=1.0':>10} | {'λ_OD=0.1':>10} | {'λ_OD=0.0':>10}")
+    print(f"{'Metric':<10} | {'Published':>10} | {'Zero-Shot':>10} | {'Bugged Bbox':>12} | {'lam_OD=1.0':>10} | {'lam_OD=0.1':>10} | {'lam_OD=0.0':>10}")
     print("-" * 90)
     
     paper_1k = {'R@10': 73.7, 'R@20': 80.6, 'R@50': 89.4, 'R@100': 93.5, 'MdR': 3.0}
