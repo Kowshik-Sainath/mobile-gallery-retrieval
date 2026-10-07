@@ -195,7 +195,7 @@ def evaluate_split(
             print(f"  {k:8s}: {v:6.2f}%" if "R@" in k else f"  {k:8s}: {v:6.2f}")
     return metrics
 
-def run_table3_evaluation(model_path: str = None):
+def run_table3_evaluation(model_path: str = None, split: str = "both"):
     print("=" * 75)
     print("TABLE 3 REPRODUCTION BENCHMARK: STNet on Test-1K & Test-5K")
     print("=" * 75)
@@ -212,16 +212,21 @@ def run_table3_evaluation(model_path: str = None):
     else:
         print("Using base initialized STNet with pretrained CLIP.")
         
-    # Evaluate Test-1K
-    metrics_1k = evaluate_split(model, split_name="val")
+    metrics_1k = None
+    metrics_5k = None
     
-    # Evaluate Test-5K (use official 5,000-image gallery if available)
-    gallery_5k_manifest = "CSTBIR/data/test5k_gallery_5000.json"
-    if os.path.exists(gallery_5k_manifest):
-        print(f"\nUsing canonical 5,000-image gallery for Test-5K ({gallery_5k_manifest})...")
-        metrics_5k = evaluate_split(model, split_name="test", gallery_manifest=gallery_5k_manifest)
-    else:
-        metrics_5k = evaluate_split(model, split_name="test")
+    if split in ["val", "both"]:
+        # Evaluate Test-1K
+        metrics_1k = evaluate_split(model, split_name="val")
+    
+    if split in ["test", "both"]:
+        # Evaluate Test-5K (use official 5,000-image gallery if available)
+        gallery_5k_manifest = "CSTBIR/data/test5k_gallery_5000.json"
+        if os.path.exists(gallery_5k_manifest):
+            print(f"\nUsing canonical 5,000-image gallery for Test-5K ({gallery_5k_manifest})...")
+            metrics_5k = evaluate_split(model, split_name="test", gallery_manifest=gallery_5k_manifest)
+        else:
+            metrics_5k = evaluate_split(model, split_name="test")
     
     # Print Table 3 Comparison
     print("\n" + "=" * 80)
@@ -230,22 +235,28 @@ def run_table3_evaluation(model_path: str = None):
     print(f"{'Split':<10} | {'Metric':<8} | {'Published Paper':>16} | {'Reimplemented':>16} | {'Delta':>10}")
     print("-" * 80)
     
-    paper_1k = {'R@10': 73.7, 'R@20': 80.6, 'R@50': 89.4, 'R@100': 93.5, 'MdR': 3.0}
-    for m in ['R@10', 'R@20', 'R@50', 'R@100', 'MdR']:
-        p_val = paper_1k[m]
-        r_val = metrics_1k[m]
-        delta = r_val - p_val
-        print(f"{'Test-1K':<10} | {m:<8} | {p_val:16.1f} | {r_val:16.1f} | {delta:+10.1f}")
+    if metrics_1k is not None:
+        paper_1k = {'R@10': 73.7, 'R@20': 80.6, 'R@50': 89.4, 'R@100': 93.5, 'MdR': 3.0}
+        for m in ['R@10', 'R@20', 'R@50', 'R@100', 'MdR']:
+            p_val = paper_1k[m]
+            r_val = metrics_1k[m]
+            delta = r_val - p_val
+            print(f"{'Test-1K':<10} | {m:<8} | {p_val:16.1f} | {r_val:16.1f} | {delta:+10.1f}")
         
-    print("-" * 80)
-    paper_5k = {'R@10': 38.7, 'R@20': 50.0, 'R@50': 64.6, 'R@100': 74.5, 'MdR': 20.5}
-    for m in ['R@10', 'R@20', 'R@50', 'R@100', 'MdR']:
-        p_val = paper_5k[m]
-        r_val = metrics_5k[m]
-        delta = r_val - p_val
-        print(f"{'Test-5K':<10} | {m:<8} | {p_val:16.1f} | {r_val:16.1f} | {delta:+10.1f}")
+    if metrics_5k is not None:
+        print("-" * 80)
+        paper_5k = {'R@10': 38.7, 'R@20': 50.0, 'R@50': 64.6, 'R@100': 74.5, 'MdR': 20.5}
+        for m in ['R@10', 'R@20', 'R@50', 'R@100', 'MdR']:
+            p_val = paper_5k[m]
+            r_val = metrics_5k[m]
+            delta = r_val - p_val
+            print(f"{'Test-5K':<10} | {m:<8} | {p_val:16.1f} | {r_val:16.1f} | {delta:+10.1f}")
     print("=" * 80)
 
 if __name__ == "__main__":
-    ckpt = sys.argv[1] if len(sys.argv) > 1 else None
-    run_table3_evaluation(ckpt)
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument("model_path", nargs="?", default=None)
+    parser.add_argument("--split", choices=["val", "test", "both"], default="both")
+    args = parser.parse_args()
+    run_table3_evaluation(args.model_path, split=args.split)

@@ -1,0 +1,16 @@
+{
+  "stratified_set": {
+    "num_images": 3324,
+    "overlap_test1k_gallery": 0,
+    "overlap_test5k_targets": 0,
+    "overlap_test5k_canonical_gallery": 0,
+    "is_clean": true
+  },
+  "old_contiguous_set": {
+    "num_images": 238,
+    "overlap_test1k_gallery": 0,
+    "overlap_test5k_targets": 0,
+    "overlap_test5k_canonical_gallery": 11,
+    "is_clean": false
+  }
+}
