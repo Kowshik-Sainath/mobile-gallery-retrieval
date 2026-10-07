@@ -1,0 +1,28 @@
+{
+  "val": {
+    "split": "val",
+    "num_queries": 1000,
+    "num_gallery": 1000,
+    "present_gallery": 1000,
+    "missing_gallery_list": [],
+    "too_small_gallery_list": [],
+    "num_unique_sketches": 999,
+    "present_unique_sketches": 999,
+    "missing_unique_sketches_list": [],
+    "query_sketch_present": 1000,
+    "queries_fully_valid": 1000
+  },
+  "test": {
+    "split": "test",
+    "num_queries": 4001,
+    "num_gallery": 2214,
+    "present_gallery": 2214,
+    "missing_gallery_list": [],
+    "too_small_gallery_list": [],
+    "num_unique_sketches": 2991,
+    "present_unique_sketches": 2991,
+    "missing_unique_sketches_list": [],
+    "query_sketch_present": 4001,
+    "queries_fully_valid": 4001
+  }
+}
