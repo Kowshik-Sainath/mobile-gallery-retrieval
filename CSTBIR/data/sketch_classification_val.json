@@ -1,0 +1,6932 @@
+[
+  {
+    "sketch": "mouse_4670.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "flower_4518.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "bridge_8022.jpg",
+    "label": "bridge",
+    "class_idx": 32
+  },
+  {
+    "sketch": "bicycle_5426.jpg",
+    "label": "bicycle",
+    "class_idx": 22
+  },
+  {
+    "sketch": "laptop_11742.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "sweater_6256.jpg",
+    "label": "sweater",
+    "class_idx": 224
+  },
+  {
+    "sketch": "zebra_27663.jpg",
+    "label": "zebra",
+    "class_idx": 256
+  },
+  {
+    "sketch": "train_81137.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "bear_35415.jpg",
+    "label": "bear",
+    "class_idx": 16
+  },
+  {
+    "sketch": "bus_50460.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "sink_17617.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "cup_14785.jpg",
+    "label": "cup",
+    "class_idx": 67
+  },
+  {
+    "sketch": "hat_32405.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "eye_21296.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "hat_29792.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "shoe_12965.jpg",
+    "label": "shoe",
+    "class_idx": 194
+  },
+  {
+    "sketch": "face_25883.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "table_94515.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "cat_30883.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "table_99550.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "train_76857.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "bee_36.jpg",
+    "label": "bee",
+    "class_idx": 19
+  },
+  {
+    "sketch": "ladder_956.jpg",
+    "label": "ladder",
+    "class_idx": 120
+  },
+  {
+    "sketch": "beach_21093.jpg",
+    "label": "beach",
+    "class_idx": 15
+  },
+  {
+    "sketch": "sun_7906.jpg",
+    "label": "sun",
+    "class_idx": 222
+  },
+  {
+    "sketch": "face_26423.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "giraffe_32624.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "calendar_259.jpg",
+    "label": "calendar",
+    "class_idx": 41
+  },
+  {
+    "sketch": "shark_118.jpg",
+    "label": "shark",
+    "class_idx": 192
+  },
+  {
+    "sketch": "car_57102.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "candle_971.jpg",
+    "label": "candle",
+    "class_idx": 46
+  },
+  {
+    "sketch": "sink_18152.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "door_40648.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "mushroom_141.jpg",
+    "label": "mushroom",
+    "class_idx": 148
+  },
+  {
+    "sketch": "nose_22993.jpg",
+    "label": "nose",
+    "class_idx": 151
+  },
+  {
+    "sketch": "hand_48739.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "cloud_4897.jpg",
+    "label": "cloud",
+    "class_idx": 58
+  },
+  {
+    "sketch": "toilet_27661.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "helmet_19910.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "knife_2865.jpg",
+    "label": "knife",
+    "class_idx": 119
+  },
+  {
+    "sketch": "chair_32743.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "baseball_33722.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "fireplace_1399.jpg",
+    "label": "fireplace",
+    "class_idx": 87
+  },
+  {
+    "sketch": "table_90372.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "arm_16904.jpg",
+    "label": "arm",
+    "class_idx": 5
+  },
+  {
+    "sketch": "mug_3345.jpg",
+    "label": "mug",
+    "class_idx": 147
+  },
+  {
+    "sketch": "wheel_16827.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "bridge_5197.jpg",
+    "label": "bridge",
+    "class_idx": 32
+  },
+  {
+    "sketch": "umbrella_15772.jpg",
+    "label": "umbrella",
+    "class_idx": 246
+  },
+  {
+    "sketch": "barn_340.jpg",
+    "label": "barn",
+    "class_idx": 11
+  },
+  {
+    "sketch": "umbrella_20403.jpg",
+    "label": "umbrella",
+    "class_idx": 246
+  },
+  {
+    "sketch": "skull_22.jpg",
+    "label": "skull",
+    "class_idx": 199
+  },
+  {
+    "sketch": "rabbit_301.jpg",
+    "label": "rabbit",
+    "class_idx": 178
+  },
+  {
+    "sketch": "speedboat_21.jpg",
+    "label": "speedboat",
+    "class_idx": 207
+  },
+  {
+    "sketch": "pants_33228.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "car_55592.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "streetlight_429.jpg",
+    "label": "streetlight",
+    "class_idx": 219
+  },
+  {
+    "sketch": "table_89646.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "laptop_17959.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "umbrella_23277.jpg",
+    "label": "umbrella",
+    "class_idx": 246
+  },
+  {
+    "sketch": "skateboard_19298.jpg",
+    "label": "skateboard",
+    "class_idx": 198
+  },
+  {
+    "sketch": "camouflage_29.jpg",
+    "label": "camouflage",
+    "class_idx": 44
+  },
+  {
+    "sketch": "hand_49456.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "duck_2353.jpg",
+    "label": "duck",
+    "class_idx": 77
+  },
+  {
+    "sketch": "grass_70842.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "baseball_26362.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "keyboard_5558.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "underwear_128.jpg",
+    "label": "underwear",
+    "class_idx": 247
+  },
+  {
+    "sketch": "flower_29.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "vase_14057.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "parrot_541.jpg",
+    "label": "parrot",
+    "class_idx": 160
+  },
+  {
+    "sketch": "table_91907.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "bird_25906.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "table_94469.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "cannon_8.jpg",
+    "label": "cannon",
+    "class_idx": 47
+  },
+  {
+    "sketch": "oven_5526.jpg",
+    "label": "oven",
+    "class_idx": 154
+  },
+  {
+    "sketch": "door_36279.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "pencil_351.jpg",
+    "label": "pencil",
+    "class_idx": 165
+  },
+  {
+    "sketch": "bus_53274.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "clarinet_11.jpg",
+    "label": "clarinet",
+    "class_idx": 56
+  },
+  {
+    "sketch": "apple_6564.jpg",
+    "label": "apple",
+    "class_idx": 4
+  },
+  {
+    "sketch": "bear_32138.jpg",
+    "label": "bear",
+    "class_idx": 16
+  },
+  {
+    "sketch": "cooler_473.jpg",
+    "label": "cooler",
+    "class_idx": 61
+  },
+  {
+    "sketch": "camera_10065.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "sandwich_9257.jpg",
+    "label": "sandwich",
+    "class_idx": 188
+  },
+  {
+    "sketch": "telephone_2767.jpg",
+    "label": "telephone",
+    "class_idx": 231
+  },
+  {
+    "sketch": "crayon_30.jpg",
+    "label": "crayon",
+    "class_idx": 64
+  },
+  {
+    "sketch": "jacket_32443.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "screwdriver_63.jpg",
+    "label": "screwdriver",
+    "class_idx": 191
+  },
+  {
+    "sketch": "snowman_200.jpg",
+    "label": "snowman",
+    "class_idx": 205
+  },
+  {
+    "sketch": "car_56370.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "bird_25898.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "van_3513.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "car_52611.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "sink_7711.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "owl_229.jpg",
+    "label": "owl",
+    "class_idx": 155
+  },
+  {
+    "sketch": "umbrella_19680.jpg",
+    "label": "umbrella",
+    "class_idx": 246
+  },
+  {
+    "sketch": "basket_7454.jpg",
+    "label": "basket",
+    "class_idx": 13
+  },
+  {
+    "sketch": "ocean_14331.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "foot_1949.jpg",
+    "label": "foot",
+    "class_idx": 92
+  },
+  {
+    "sketch": "table_87918.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "shoe_12966.jpg",
+    "label": "shoe",
+    "class_idx": 194
+  },
+  {
+    "sketch": "penguin_179.jpg",
+    "label": "penguin",
+    "class_idx": 166
+  },
+  {
+    "sketch": "angel_318.jpg",
+    "label": "angel",
+    "class_idx": 1
+  },
+  {
+    "sketch": "sun_1948.jpg",
+    "label": "sun",
+    "class_idx": 222
+  },
+  {
+    "sketch": "pillow_7023.jpg",
+    "label": "pillow",
+    "class_idx": 169
+  },
+  {
+    "sketch": "horse_30436.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "clarinet_0.jpg",
+    "label": "clarinet",
+    "class_idx": 56
+  },
+  {
+    "sketch": "canoe_188.jpg",
+    "label": "canoe",
+    "class_idx": 48
+  },
+  {
+    "sketch": "cat_38333.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "telephone_1509.jpg",
+    "label": "telephone",
+    "class_idx": 231
+  },
+  {
+    "sketch": "bee_27.jpg",
+    "label": "bee",
+    "class_idx": 19
+  },
+  {
+    "sketch": "bulldozer_41.jpg",
+    "label": "bulldozer",
+    "class_idx": 36
+  },
+  {
+    "sketch": "door_28493.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "mountain_10897.jpg",
+    "label": "mountain",
+    "class_idx": 143
+  },
+  {
+    "sketch": "mushroom_437.jpg",
+    "label": "mushroom",
+    "class_idx": 148
+  },
+  {
+    "sketch": "car_46586.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "sweater_6482.jpg",
+    "label": "sweater",
+    "class_idx": 224
+  },
+  {
+    "sketch": "flamingo_112.jpg",
+    "label": "flamingo",
+    "class_idx": 89
+  },
+  {
+    "sketch": "mushroom_1.jpg",
+    "label": "mushroom",
+    "class_idx": 148
+  },
+  {
+    "sketch": "wheel_18716.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "mouse_2915.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "candle_1243.jpg",
+    "label": "candle",
+    "class_idx": 46
+  },
+  {
+    "sketch": "shorts_17987.jpg",
+    "label": "shorts",
+    "class_idx": 195
+  },
+  {
+    "sketch": "eye_21251.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "sink_14105.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "pizza_29246.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "whale_40.jpg",
+    "label": "whale",
+    "class_idx": 252
+  },
+  {
+    "sketch": "table_91288.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "microphone_698.jpg",
+    "label": "microphone",
+    "class_idx": 138
+  },
+  {
+    "sketch": "helmet_23088.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "bear_27926.jpg",
+    "label": "bear",
+    "class_idx": 16
+  },
+  {
+    "sketch": "table_94731.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "toilet_21677.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "table_96320.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "laptop_18065.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "laptop_16968.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "flower_3133.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "guitar_895.jpg",
+    "label": "guitar",
+    "class_idx": 100
+  },
+  {
+    "sketch": "skateboard_22140.jpg",
+    "label": "skateboard",
+    "class_idx": 198
+  },
+  {
+    "sketch": "brain_2.jpg",
+    "label": "brain",
+    "class_idx": 30
+  },
+  {
+    "sketch": "crown_5.jpg",
+    "label": "crown",
+    "class_idx": 66
+  },
+  {
+    "sketch": "laptop_14352.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "binoculars_49.jpg",
+    "label": "binoculars",
+    "class_idx": 23
+  },
+  {
+    "sketch": "toilet_26987.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "arm_16919.jpg",
+    "label": "arm",
+    "class_idx": 5
+  },
+  {
+    "sketch": "ocean_8049.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "beach_20597.jpg",
+    "label": "beach",
+    "class_idx": 15
+  },
+  {
+    "sketch": "microphone_238.jpg",
+    "label": "microphone",
+    "class_idx": 138
+  },
+  {
+    "sketch": "car_57902.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "dresser_1112.jpg",
+    "label": "dresser",
+    "class_idx": 75
+  },
+  {
+    "sketch": "purse_4092.jpg",
+    "label": "purse",
+    "class_idx": 177
+  },
+  {
+    "sketch": "bus_52370.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "jacket_10612.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "crown_295.jpg",
+    "label": "crown",
+    "class_idx": 66
+  },
+  {
+    "sketch": "pizza_29847.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "vase_13058.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "broccoli_2358.jpg",
+    "label": "broccoli",
+    "class_idx": 33
+  },
+  {
+    "sketch": "pliers_25.jpg",
+    "label": "pliers",
+    "class_idx": 172
+  },
+  {
+    "sketch": "mouse_5934.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "donut_5606.jpg",
+    "label": "donut",
+    "class_idx": 72
+  },
+  {
+    "sketch": "pillow_9951.jpg",
+    "label": "pillow",
+    "class_idx": 169
+  },
+  {
+    "sketch": "bracelet_1421.jpg",
+    "label": "bracelet",
+    "class_idx": 29
+  },
+  {
+    "sketch": "bucket_2836.jpg",
+    "label": "bucket",
+    "class_idx": 35
+  },
+  {
+    "sketch": "table_92460.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "train_76771.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "t-shirt_4187.jpg",
+    "label": "t-shirt",
+    "class_idx": 227
+  },
+  {
+    "sketch": "car_55997.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "laptop_16424.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "backpack_5989.jpg",
+    "label": "backpack",
+    "class_idx": 8
+  },
+  {
+    "sketch": "train_66805.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "spider_96.jpg",
+    "label": "spider",
+    "class_idx": 208
+  },
+  {
+    "sketch": "fan_2042.jpg",
+    "label": "fan",
+    "class_idx": 85
+  },
+  {
+    "sketch": "dresser_550.jpg",
+    "label": "dresser",
+    "class_idx": 75
+  },
+  {
+    "sketch": "zebra_28244.jpg",
+    "label": "zebra",
+    "class_idx": 256
+  },
+  {
+    "sketch": "cat_31575.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "river_2504.jpg",
+    "label": "river",
+    "class_idx": 186
+  },
+  {
+    "sketch": "hand_50614.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "calculator_25.jpg",
+    "label": "calculator",
+    "class_idx": 40
+  },
+  {
+    "sketch": "pillow_8743.jpg",
+    "label": "pillow",
+    "class_idx": 169
+  },
+  {
+    "sketch": "table_92973.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "toilet_22474.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "crown_556.jpg",
+    "label": "crown",
+    "class_idx": 66
+  },
+  {
+    "sketch": "mailbox_40.jpg",
+    "label": "mailbox",
+    "class_idx": 132
+  },
+  {
+    "sketch": "castle_36.jpg",
+    "label": "castle",
+    "class_idx": 51
+  },
+  {
+    "sketch": "house_15807.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "table_90233.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "stove_6283.jpg",
+    "label": "stove",
+    "class_idx": 217
+  },
+  {
+    "sketch": "sweater_9.jpg",
+    "label": "sweater",
+    "class_idx": 224
+  },
+  {
+    "sketch": "vase_14636.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "cat_39003.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "lipstick_72.jpg",
+    "label": "lipstick",
+    "class_idx": 129
+  },
+  {
+    "sketch": "sock_2261.jpg",
+    "label": "sock",
+    "class_idx": 206
+  },
+  {
+    "sketch": "nose_14051.jpg",
+    "label": "nose",
+    "class_idx": 151
+  },
+  {
+    "sketch": "wheel_18059.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "swan_124.jpg",
+    "label": "swan",
+    "class_idx": 223
+  },
+  {
+    "sketch": "clock_39667.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "mermaid_24.jpg",
+    "label": "mermaid",
+    "class_idx": 137
+  },
+  {
+    "sketch": "camel_55.jpg",
+    "label": "camel",
+    "class_idx": 42
+  },
+  {
+    "sketch": "van_3813.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "grass_70866.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "jacket_30966.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "necklace_2797.jpg",
+    "label": "necklace",
+    "class_idx": 150
+  },
+  {
+    "sketch": "peas_298.jpg",
+    "label": "peas",
+    "class_idx": 164
+  },
+  {
+    "sketch": "cat_31944.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "rake_29.jpg",
+    "label": "rake",
+    "class_idx": 183
+  },
+  {
+    "sketch": "spoon_5966.jpg",
+    "label": "spoon",
+    "class_idx": 209
+  },
+  {
+    "sketch": "mouse_4554.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "dolphin_108.jpg",
+    "label": "dolphin",
+    "class_idx": 71
+  },
+  {
+    "sketch": "harp_13.jpg",
+    "label": "harp",
+    "class_idx": 104
+  },
+  {
+    "sketch": "river_4956.jpg",
+    "label": "river",
+    "class_idx": 186
+  },
+  {
+    "sketch": "clock_39568.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "jacket_30352.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "chair_25487.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "mailbox_1.jpg",
+    "label": "mailbox",
+    "class_idx": 132
+  },
+  {
+    "sketch": "ear_24334.jpg",
+    "label": "ear",
+    "class_idx": 78
+  },
+  {
+    "sketch": "pizza_32565.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "zebra_27975.jpg",
+    "label": "zebra",
+    "class_idx": 256
+  },
+  {
+    "sketch": "violin_21.jpg",
+    "label": "violin",
+    "class_idx": 250
+  },
+  {
+    "sketch": "marker_969.jpg",
+    "label": "marker",
+    "class_idx": 134
+  },
+  {
+    "sketch": "pool_2148.jpg",
+    "label": "pool",
+    "class_idx": 173
+  },
+  {
+    "sketch": "toilet_27310.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "carrot_727.jpg",
+    "label": "carrot",
+    "class_idx": 50
+  },
+  {
+    "sketch": "lobster_48.jpg",
+    "label": "lobster",
+    "class_idx": 130
+  },
+  {
+    "sketch": "peanut_176.jpg",
+    "label": "peanut",
+    "class_idx": 162
+  },
+  {
+    "sketch": "backpack_4279.jpg",
+    "label": "backpack",
+    "class_idx": 8
+  },
+  {
+    "sketch": "bus_49962.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "underwear_30.jpg",
+    "label": "underwear",
+    "class_idx": 247
+  },
+  {
+    "sketch": "tooth_708.jpg",
+    "label": "tooth",
+    "class_idx": 237
+  },
+  {
+    "sketch": "lobster_0.jpg",
+    "label": "lobster",
+    "class_idx": 130
+  },
+  {
+    "sketch": "grass_74139.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "camera_6050.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "hat_32058.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "belt_3389.jpg",
+    "label": "belt",
+    "class_idx": 20
+  },
+  {
+    "sketch": "cat_30208.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "toothpaste_399.jpg",
+    "label": "toothpaste",
+    "class_idx": 239
+  },
+  {
+    "sketch": "toilet_27623.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "hand_48008.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "sink_9577.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "bench_21334.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "clock_36657.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "bird_25931.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "shoe_7026.jpg",
+    "label": "shoe",
+    "class_idx": 194
+  },
+  {
+    "sketch": "helmet_23305.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "hat_30399.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "chair_34640.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "grass_66488.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "megaphone_13.jpg",
+    "label": "megaphone",
+    "class_idx": 136
+  },
+  {
+    "sketch": "chair_22166.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "eye_21246.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "elephant_29157.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "bus_52391.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "lollipop_28.jpg",
+    "label": "lollipop",
+    "class_idx": 131
+  },
+  {
+    "sketch": "stairs_3816.jpg",
+    "label": "stairs",
+    "class_idx": 211
+  },
+  {
+    "sketch": "baseball_29998.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "table_93535.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "foot_11761.jpg",
+    "label": "foot",
+    "class_idx": 92
+  },
+  {
+    "sketch": "table_84590.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "frog_68.jpg",
+    "label": "frog",
+    "class_idx": 94
+  },
+  {
+    "sketch": "fish_1997.jpg",
+    "label": "fish",
+    "class_idx": 88
+  },
+  {
+    "sketch": "van_2811.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "knife_9255.jpg",
+    "label": "knife",
+    "class_idx": 119
+  },
+  {
+    "sketch": "hat_27064.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "bench_22475.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "keyboard_8081.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "ambulance_97.jpg",
+    "label": "ambulance",
+    "class_idx": 0
+  },
+  {
+    "sketch": "ant_1.jpg",
+    "label": "ant",
+    "class_idx": 2
+  },
+  {
+    "sketch": "submarine_35.jpg",
+    "label": "submarine",
+    "class_idx": 220
+  },
+  {
+    "sketch": "fork_9334.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "bus_52453.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "shark_45.jpg",
+    "label": "shark",
+    "class_idx": 192
+  },
+  {
+    "sketch": "truck_20944.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "pants_32207.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "oven_5313.jpg",
+    "label": "oven",
+    "class_idx": 154
+  },
+  {
+    "sketch": "clarinet_12.jpg",
+    "label": "clarinet",
+    "class_idx": 56
+  },
+  {
+    "sketch": "laptop_9097.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "toilet_24514.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "bear_34182.jpg",
+    "label": "bear",
+    "class_idx": 16
+  },
+  {
+    "sketch": "foot_11039.jpg",
+    "label": "foot",
+    "class_idx": 92
+  },
+  {
+    "sketch": "truck_30910.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "baseball_22745.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "train_76800.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "sandwich_9740.jpg",
+    "label": "sandwich",
+    "class_idx": 188
+  },
+  {
+    "sketch": "fork_28.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "laptop_17486.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "house_16555.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "dog_47729.jpg",
+    "label": "dog",
+    "class_idx": 70
+  },
+  {
+    "sketch": "purse_4299.jpg",
+    "label": "purse",
+    "class_idx": 177
+  },
+  {
+    "sketch": "chair_23803.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "bear_36565.jpg",
+    "label": "bear",
+    "class_idx": 16
+  },
+  {
+    "sketch": "submarine_32.jpg",
+    "label": "submarine",
+    "class_idx": 220
+  },
+  {
+    "sketch": "train_77278.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "lighthouse_420.jpg",
+    "label": "lighthouse",
+    "class_idx": 126
+  },
+  {
+    "sketch": "watermelon_347.jpg",
+    "label": "watermelon",
+    "class_idx": 251
+  },
+  {
+    "sketch": "table_86840.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "toaster_804.jpg",
+    "label": "toaster",
+    "class_idx": 234
+  },
+  {
+    "sketch": "helicopter_130.jpg",
+    "label": "helicopter",
+    "class_idx": 108
+  },
+  {
+    "sketch": "helmet_24004.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "harp_8.jpg",
+    "label": "harp",
+    "class_idx": 104
+  },
+  {
+    "sketch": "baseball_32565.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "line_8066.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "clock_39249.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "mermaid_43.jpg",
+    "label": "mermaid",
+    "class_idx": 137
+  },
+  {
+    "sketch": "house_17355.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "toilet_22549.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "car_57127.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "mosquito_9.jpg",
+    "label": "mosquito",
+    "class_idx": 141
+  },
+  {
+    "sketch": "laptop_14952.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "door_35816.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "table_90729.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "stairs_3746.jpg",
+    "label": "stairs",
+    "class_idx": 211
+  },
+  {
+    "sketch": "brain_5.jpg",
+    "label": "brain",
+    "class_idx": 30
+  },
+  {
+    "sketch": "helmet_22590.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "pants_28904.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "shorts_21019.jpg",
+    "label": "shorts",
+    "class_idx": 195
+  },
+  {
+    "sketch": "flower_12372.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "eye_22033.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "watermelon_316.jpg",
+    "label": "watermelon",
+    "class_idx": 251
+  },
+  {
+    "sketch": "microwave_2691.jpg",
+    "label": "microwave",
+    "class_idx": 139
+  },
+  {
+    "sketch": "harp_6.jpg",
+    "label": "harp",
+    "class_idx": 104
+  },
+  {
+    "sketch": "frog_35.jpg",
+    "label": "frog",
+    "class_idx": 94
+  },
+  {
+    "sketch": "camera_5940.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "bench_23316.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "chandelier_326.jpg",
+    "label": "chandelier",
+    "class_idx": 55
+  },
+  {
+    "sketch": "hand_40779.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "cloud_0.jpg",
+    "label": "cloud",
+    "class_idx": 58
+  },
+  {
+    "sketch": "umbrella_21407.jpg",
+    "label": "umbrella",
+    "class_idx": 246
+  },
+  {
+    "sketch": "helmet_18581.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "rifle_14.jpg",
+    "label": "rifle",
+    "class_idx": 185
+  },
+  {
+    "sketch": "pig_137.jpg",
+    "label": "pig",
+    "class_idx": 168
+  },
+  {
+    "sketch": "bench_20558.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "banana_5105.jpg",
+    "label": "banana",
+    "class_idx": 9
+  },
+  {
+    "sketch": "raccoon_19.jpg",
+    "label": "raccoon",
+    "class_idx": 179
+  },
+  {
+    "sketch": "bus_48502.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "car_49109.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "pencil_224.jpg",
+    "label": "pencil",
+    "class_idx": 165
+  },
+  {
+    "sketch": "table_94714.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "pool_2315.jpg",
+    "label": "pool",
+    "class_idx": 173
+  },
+  {
+    "sketch": "giraffe_36534.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "hand_49953.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "bus_43916.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "necklace_2051.jpg",
+    "label": "necklace",
+    "class_idx": 150
+  },
+  {
+    "sketch": "vase_13213.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "train_76194.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "truck_24997.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "vase_11063.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "hand_47988.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "toaster_1233.jpg",
+    "label": "toaster",
+    "class_idx": 234
+  },
+  {
+    "sketch": "headphones_1.jpg",
+    "label": "headphones",
+    "class_idx": 106
+  },
+  {
+    "sketch": "bandage_1.jpg",
+    "label": "bandage",
+    "class_idx": 10
+  },
+  {
+    "sketch": "hand_40626.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "baseball_27365.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "ear_18112.jpg",
+    "label": "ear",
+    "class_idx": 78
+  },
+  {
+    "sketch": "table_92999.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "door_37782.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "jacket_8735.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "van_4615.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "streetlight_751.jpg",
+    "label": "streetlight",
+    "class_idx": 219
+  },
+  {
+    "sketch": "donut_5160.jpg",
+    "label": "donut",
+    "class_idx": 72
+  },
+  {
+    "sketch": "table_99009.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "peanut_242.jpg",
+    "label": "peanut",
+    "class_idx": 162
+  },
+  {
+    "sketch": "cat_38884.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "toilet_24893.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "necklace_1340.jpg",
+    "label": "necklace",
+    "class_idx": 150
+  },
+  {
+    "sketch": "ocean_15100.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "cat_33756.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "horse_30456.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "pizza_31321.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "apple_6578.jpg",
+    "label": "apple",
+    "class_idx": 4
+  },
+  {
+    "sketch": "clock_37806.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "screwdriver_44.jpg",
+    "label": "screwdriver",
+    "class_idx": 191
+  },
+  {
+    "sketch": "table_95871.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "hand_43330.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "grass_70050.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "pants_31235.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "flower_12383.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "grass_60555.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "bench_28506.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "grapes_5.jpg",
+    "label": "grapes",
+    "class_idx": 98
+  },
+  {
+    "sketch": "clock_35082.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "snowman_7.jpg",
+    "label": "snowman",
+    "class_idx": 205
+  },
+  {
+    "sketch": "syringe_4.jpg",
+    "label": "syringe",
+    "class_idx": 226
+  },
+  {
+    "sketch": "nose_22994.jpg",
+    "label": "nose",
+    "class_idx": 151
+  },
+  {
+    "sketch": "chair_30943.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "knee_2497.jpg",
+    "label": "knee",
+    "class_idx": 118
+  },
+  {
+    "sketch": "sandwich_9320.jpg",
+    "label": "sandwich",
+    "class_idx": 188
+  },
+  {
+    "sketch": "ocean_14319.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "donut_2848.jpg",
+    "label": "donut",
+    "class_idx": 72
+  },
+  {
+    "sketch": "hammer_8.jpg",
+    "label": "hammer",
+    "class_idx": 102
+  },
+  {
+    "sketch": "swan_210.jpg",
+    "label": "swan",
+    "class_idx": 223
+  },
+  {
+    "sketch": "donut_4188.jpg",
+    "label": "donut",
+    "class_idx": 72
+  },
+  {
+    "sketch": "pineapple_291.jpg",
+    "label": "pineapple",
+    "class_idx": 170
+  },
+  {
+    "sketch": "leaf_4030.jpg",
+    "label": "leaf",
+    "class_idx": 123
+  },
+  {
+    "sketch": "flamingo_195.jpg",
+    "label": "flamingo",
+    "class_idx": 89
+  },
+  {
+    "sketch": "belt_4618.jpg",
+    "label": "belt",
+    "class_idx": 20
+  },
+  {
+    "sketch": "house_4604.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "bread_6008.jpg",
+    "label": "bread",
+    "class_idx": 31
+  },
+  {
+    "sketch": "grass_74424.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "pig_72.jpg",
+    "label": "pig",
+    "class_idx": 168
+  },
+  {
+    "sketch": "elephant_23667.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "grass_52331.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "cat_38762.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "keyboard_8810.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "submarine_11.jpg",
+    "label": "submarine",
+    "class_idx": 220
+  },
+  {
+    "sketch": "pencil_222.jpg",
+    "label": "pencil",
+    "class_idx": 165
+  },
+  {
+    "sketch": "bus_50426.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "chair_33905.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "raccoon_6.jpg",
+    "label": "raccoon",
+    "class_idx": 179
+  },
+  {
+    "sketch": "sweater_6476.jpg",
+    "label": "sweater",
+    "class_idx": 224
+  },
+  {
+    "sketch": "toilet_16849.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "fork_9337.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "garden_924.jpg",
+    "label": "garden",
+    "class_idx": 95
+  },
+  {
+    "sketch": "zebra_27677.jpg",
+    "label": "zebra",
+    "class_idx": 256
+  },
+  {
+    "sketch": "cat_38898.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "giraffe_36540.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "oven_32.jpg",
+    "label": "oven",
+    "class_idx": 154
+  },
+  {
+    "sketch": "table_90435.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "horse_30258.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "rainbow_637.jpg",
+    "label": "rainbow",
+    "class_idx": 182
+  },
+  {
+    "sketch": "door_39142.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "camera_7762.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "camera_4963.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "house_16669.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "mermaid_44.jpg",
+    "label": "mermaid",
+    "class_idx": 137
+  },
+  {
+    "sketch": "cat_36518.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "eye_19338.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "baseball_30228.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "spoon_3704.jpg",
+    "label": "spoon",
+    "class_idx": 209
+  },
+  {
+    "sketch": "bird_16875.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "owl_202.jpg",
+    "label": "owl",
+    "class_idx": 155
+  },
+  {
+    "sketch": "bicycle_8581.jpg",
+    "label": "bicycle",
+    "class_idx": 22
+  },
+  {
+    "sketch": "hat_28710.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "pear_123.jpg",
+    "label": "pear",
+    "class_idx": 163
+  },
+  {
+    "sketch": "laptop_9.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "rain_86.jpg",
+    "label": "rain",
+    "class_idx": 181
+  },
+  {
+    "sketch": "car_57162.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "streetlight_771.jpg",
+    "label": "streetlight",
+    "class_idx": 219
+  },
+  {
+    "sketch": "ocean_15169.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "camouflage_298.jpg",
+    "label": "camouflage",
+    "class_idx": 44
+  },
+  {
+    "sketch": "potato_1029.jpg",
+    "label": "potato",
+    "class_idx": 176
+  },
+  {
+    "sketch": "bed_26564.jpg",
+    "label": "bed",
+    "class_idx": 18
+  },
+  {
+    "sketch": "leg_13056.jpg",
+    "label": "leg",
+    "class_idx": 124
+  },
+  {
+    "sketch": "trumpet_18.jpg",
+    "label": "trumpet",
+    "class_idx": 245
+  },
+  {
+    "sketch": "car_54965.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "keyboard_827.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "house_10682.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "line_20795.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "cat_33611.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "toothpaste_523.jpg",
+    "label": "toothpaste",
+    "class_idx": 239
+  },
+  {
+    "sketch": "table_95491.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "stove_2405.jpg",
+    "label": "stove",
+    "class_idx": 217
+  },
+  {
+    "sketch": "rake_13.jpg",
+    "label": "rake",
+    "class_idx": 183
+  },
+  {
+    "sketch": "skyscraper_232.jpg",
+    "label": "skyscraper",
+    "class_idx": 200
+  },
+  {
+    "sketch": "elephant_33451.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "pig_263.jpg",
+    "label": "pig",
+    "class_idx": 168
+  },
+  {
+    "sketch": "cloud_6426.jpg",
+    "label": "cloud",
+    "class_idx": 58
+  },
+  {
+    "sketch": "line_19801.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "mouth_13350.jpg",
+    "label": "mouth",
+    "class_idx": 146
+  },
+  {
+    "sketch": "nose_20936.jpg",
+    "label": "nose",
+    "class_idx": 151
+  },
+  {
+    "sketch": "mouse_7310.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "hat_31298.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "skull_133.jpg",
+    "label": "skull",
+    "class_idx": 199
+  },
+  {
+    "sketch": "chair_30888.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "horse_32434.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "stethoscope_6.jpg",
+    "label": "stethoscope",
+    "class_idx": 215
+  },
+  {
+    "sketch": "ocean_15021.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "microwave_511.jpg",
+    "label": "microwave",
+    "class_idx": 139
+  },
+  {
+    "sketch": "guitar_213.jpg",
+    "label": "guitar",
+    "class_idx": 100
+  },
+  {
+    "sketch": "oven_21.jpg",
+    "label": "oven",
+    "class_idx": 154
+  },
+  {
+    "sketch": "hurricane_8.jpg",
+    "label": "hurricane",
+    "class_idx": 113
+  },
+  {
+    "sketch": "microwave_2361.jpg",
+    "label": "microwave",
+    "class_idx": 139
+  },
+  {
+    "sketch": "bus_17927.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "spoon_499.jpg",
+    "label": "spoon",
+    "class_idx": 209
+  },
+  {
+    "sketch": "zebra_27793.jpg",
+    "label": "zebra",
+    "class_idx": 256
+  },
+  {
+    "sketch": "eye_15568.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "table_83483.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "rhinoceros_3.jpg",
+    "label": "rhinoceros",
+    "class_idx": 184
+  },
+  {
+    "sketch": "bread_7162.jpg",
+    "label": "bread",
+    "class_idx": 31
+  },
+  {
+    "sketch": "garden_396.jpg",
+    "label": "garden",
+    "class_idx": 95
+  },
+  {
+    "sketch": "rifle_42.jpg",
+    "label": "rifle",
+    "class_idx": 185
+  },
+  {
+    "sketch": "tractor_56.jpg",
+    "label": "tractor",
+    "class_idx": 241
+  },
+  {
+    "sketch": "cup_12535.jpg",
+    "label": "cup",
+    "class_idx": 67
+  },
+  {
+    "sketch": "arm_16907.jpg",
+    "label": "arm",
+    "class_idx": 5
+  },
+  {
+    "sketch": "streetlight_639.jpg",
+    "label": "streetlight",
+    "class_idx": 219
+  },
+  {
+    "sketch": "car_52632.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "postcard_39.jpg",
+    "label": "postcard",
+    "class_idx": 175
+  },
+  {
+    "sketch": "bird_25900.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "vase_8237.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "sun_7521.jpg",
+    "label": "sun",
+    "class_idx": 222
+  },
+  {
+    "sketch": "suitcase_8309.jpg",
+    "label": "suitcase",
+    "class_idx": 221
+  },
+  {
+    "sketch": "van_485.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "eye_18211.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "leaf_6674.jpg",
+    "label": "leaf",
+    "class_idx": 123
+  },
+  {
+    "sketch": "sheep_18009.jpg",
+    "label": "sheep",
+    "class_idx": 193
+  },
+  {
+    "sketch": "tent_2574.jpg",
+    "label": "tent",
+    "class_idx": 232
+  },
+  {
+    "sketch": "table_92703.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "elephant_20649.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "knife_9258.jpg",
+    "label": "knife",
+    "class_idx": 119
+  },
+  {
+    "sketch": "helmet_22413.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "feather_382.jpg",
+    "label": "feather",
+    "class_idx": 86
+  },
+  {
+    "sketch": "sink_18227.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "toothbrush_2323.jpg",
+    "label": "toothbrush",
+    "class_idx": 238
+  },
+  {
+    "sketch": "bench_21527.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "book_2167.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "mushroom_686.jpg",
+    "label": "mushroom",
+    "class_idx": 148
+  },
+  {
+    "sketch": "elephant_33462.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "popsicle_3.jpg",
+    "label": "popsicle",
+    "class_idx": 174
+  },
+  {
+    "sketch": "door_33458.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "door_39359.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "hat_32498.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "jacket_30986.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "flower_12500.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "dog_50149.jpg",
+    "label": "dog",
+    "class_idx": 70
+  },
+  {
+    "sketch": "bus_51445.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "basket_6641.jpg",
+    "label": "basket",
+    "class_idx": 13
+  },
+  {
+    "sketch": "baseball_29444.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "car_57706.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "car_51832.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "horse_32428.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "radio_238.jpg",
+    "label": "radio",
+    "class_idx": 180
+  },
+  {
+    "sketch": "mug_2750.jpg",
+    "label": "mug",
+    "class_idx": 147
+  },
+  {
+    "sketch": "motorbike_1405.jpg",
+    "label": "motorbike",
+    "class_idx": 142
+  },
+  {
+    "sketch": "table_75070.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "lighter_606.jpg",
+    "label": "lighter",
+    "class_idx": 125
+  },
+  {
+    "sketch": "basket_7658.jpg",
+    "label": "basket",
+    "class_idx": 13
+  },
+  {
+    "sketch": "door_23518.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "table_94075.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "chair_18802.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "bridge_8181.jpg",
+    "label": "bridge",
+    "class_idx": 32
+  },
+  {
+    "sketch": "hand_46406.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "bus_48953.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "bicycle_7886.jpg",
+    "label": "bicycle",
+    "class_idx": 22
+  },
+  {
+    "sketch": "chair_32798.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "table_97359.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "jacket_30904.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "table_95734.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "chair_34064.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "cat_38160.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "face_26036.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "grass_69952.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "line_21928.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "bird_25837.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "van_7938.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "bridge_8024.jpg",
+    "label": "bridge",
+    "class_idx": 32
+  },
+  {
+    "sketch": "mouse_6912.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "snowflake_32.jpg",
+    "label": "snowflake",
+    "class_idx": 204
+  },
+  {
+    "sketch": "car_56136.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "pants_28014.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "elephant_29982.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "train_80115.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "car_54972.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "giraffe_35210.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "mug_3872.jpg",
+    "label": "mug",
+    "class_idx": 147
+  },
+  {
+    "sketch": "teapot_29.jpg",
+    "label": "teapot",
+    "class_idx": 229
+  },
+  {
+    "sketch": "cannon_11.jpg",
+    "label": "cannon",
+    "class_idx": 47
+  },
+  {
+    "sketch": "toe_140.jpg",
+    "label": "toe",
+    "class_idx": 235
+  },
+  {
+    "sketch": "train_70257.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "telephone_3319.jpg",
+    "label": "telephone",
+    "class_idx": 231
+  },
+  {
+    "sketch": "table_95749.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "fan_7.jpg",
+    "label": "fan",
+    "class_idx": 85
+  },
+  {
+    "sketch": "train_74396.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "zebra_25624.jpg",
+    "label": "zebra",
+    "class_idx": 256
+  },
+  {
+    "sketch": "rain_730.jpg",
+    "label": "rain",
+    "class_idx": 181
+  },
+  {
+    "sketch": "sink_10130.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "hamburger_90.jpg",
+    "label": "hamburger",
+    "class_idx": 101
+  },
+  {
+    "sketch": "horse_32741.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "giraffe_31930.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "keyboard_8140.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "bed_27263.jpg",
+    "label": "bed",
+    "class_idx": 18
+  },
+  {
+    "sketch": "bridge_6473.jpg",
+    "label": "bridge",
+    "class_idx": 32
+  },
+  {
+    "sketch": "camel_149.jpg",
+    "label": "camel",
+    "class_idx": 42
+  },
+  {
+    "sketch": "candle_1939.jpg",
+    "label": "candle",
+    "class_idx": 46
+  },
+  {
+    "sketch": "duck_1.jpg",
+    "label": "duck",
+    "class_idx": 77
+  },
+  {
+    "sketch": "dog_47763.jpg",
+    "label": "dog",
+    "class_idx": 70
+  },
+  {
+    "sketch": "skateboard_21999.jpg",
+    "label": "skateboard",
+    "class_idx": 198
+  },
+  {
+    "sketch": "table_90117.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "onion_904.jpg",
+    "label": "onion",
+    "class_idx": 153
+  },
+  {
+    "sketch": "fork_986.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "toothbrush_2787.jpg",
+    "label": "toothbrush",
+    "class_idx": 238
+  },
+  {
+    "sketch": "pig_71.jpg",
+    "label": "pig",
+    "class_idx": 168
+  },
+  {
+    "sketch": "bread_7057.jpg",
+    "label": "bread",
+    "class_idx": 31
+  },
+  {
+    "sketch": "suitcase_8304.jpg",
+    "label": "suitcase",
+    "class_idx": 221
+  },
+  {
+    "sketch": "bulldozer_13.jpg",
+    "label": "bulldozer",
+    "class_idx": 36
+  },
+  {
+    "sketch": "bicycle_8164.jpg",
+    "label": "bicycle",
+    "class_idx": 22
+  },
+  {
+    "sketch": "book_3351.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "flower_12398.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "ambulance_82.jpg",
+    "label": "ambulance",
+    "class_idx": 0
+  },
+  {
+    "sketch": "chair_30181.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "bracelet_102.jpg",
+    "label": "bracelet",
+    "class_idx": 29
+  },
+  {
+    "sketch": "binoculars_24.jpg",
+    "label": "binoculars",
+    "class_idx": 23
+  },
+  {
+    "sketch": "bed_25581.jpg",
+    "label": "bed",
+    "class_idx": 18
+  },
+  {
+    "sketch": "grass_71937.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "drums_54.jpg",
+    "label": "drums",
+    "class_idx": 76
+  },
+  {
+    "sketch": "pants_32498.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "bird_25904.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "microphone_644.jpg",
+    "label": "microphone",
+    "class_idx": 138
+  },
+  {
+    "sketch": "leg_15070.jpg",
+    "label": "leg",
+    "class_idx": 124
+  },
+  {
+    "sketch": "stitches_0.jpg",
+    "label": "stitches",
+    "class_idx": 216
+  },
+  {
+    "sketch": "bear_35409.jpg",
+    "label": "bear",
+    "class_idx": 16
+  },
+  {
+    "sketch": "grass_67194.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "flower_11428.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "pants_25287.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "arm_9719.jpg",
+    "label": "arm",
+    "class_idx": 5
+  },
+  {
+    "sketch": "backpack_1102.jpg",
+    "label": "backpack",
+    "class_idx": 8
+  },
+  {
+    "sketch": "toothbrush_2322.jpg",
+    "label": "toothbrush",
+    "class_idx": 238
+  },
+  {
+    "sketch": "bus_50434.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "keyboard_7469.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "line_22204.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "postcard_30.jpg",
+    "label": "postcard",
+    "class_idx": 175
+  },
+  {
+    "sketch": "train_79446.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "pizza_29244.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "microwave_3765.jpg",
+    "label": "microwave",
+    "class_idx": 139
+  },
+  {
+    "sketch": "telephone_32.jpg",
+    "label": "telephone",
+    "class_idx": 231
+  },
+  {
+    "sketch": "telephone_25.jpg",
+    "label": "telephone",
+    "class_idx": 231
+  },
+  {
+    "sketch": "raccoon_3.jpg",
+    "label": "raccoon",
+    "class_idx": 179
+  },
+  {
+    "sketch": "owl_189.jpg",
+    "label": "owl",
+    "class_idx": 155
+  },
+  {
+    "sketch": "strawberry_583.jpg",
+    "label": "strawberry",
+    "class_idx": 218
+  },
+  {
+    "sketch": "arm_13871.jpg",
+    "label": "arm",
+    "class_idx": 5
+  },
+  {
+    "sketch": "sandwich_5577.jpg",
+    "label": "sandwich",
+    "class_idx": 188
+  },
+  {
+    "sketch": "broccoli_6177.jpg",
+    "label": "broccoli",
+    "class_idx": 33
+  },
+  {
+    "sketch": "bench_28694.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "car_56524.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "chair_32915.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "table_92181.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "grass_70850.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "face_24688.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "leg_13750.jpg",
+    "label": "leg",
+    "class_idx": 124
+  },
+  {
+    "sketch": "hat_31744.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "pizza_27939.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "toilet_20665.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "scissors_2111.jpg",
+    "label": "scissors",
+    "class_idx": 190
+  },
+  {
+    "sketch": "door_37269.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "bus_41291.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "snowman_15.jpg",
+    "label": "snowman",
+    "class_idx": 205
+  },
+  {
+    "sketch": "table_94442.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "banana_6919.jpg",
+    "label": "banana",
+    "class_idx": 9
+  },
+  {
+    "sketch": "bicycle_9329.jpg",
+    "label": "bicycle",
+    "class_idx": 22
+  },
+  {
+    "sketch": "toilet_18452.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "helmet_19187.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "car_55588.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "toilet_17733.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "hand_50287.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "crayon_29.jpg",
+    "label": "crayon",
+    "class_idx": 64
+  },
+  {
+    "sketch": "rake_17.jpg",
+    "label": "rake",
+    "class_idx": 183
+  },
+  {
+    "sketch": "sink_18224.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "bench_30515.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "sink_17713.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "house_17002.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "truck_29231.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "keyboard_9472.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "hat_22054.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "snake_32.jpg",
+    "label": "snake",
+    "class_idx": 202
+  },
+  {
+    "sketch": "canoe_241.jpg",
+    "label": "canoe",
+    "class_idx": 48
+  },
+  {
+    "sketch": "wheel_18030.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "purse_3238.jpg",
+    "label": "purse",
+    "class_idx": 177
+  },
+  {
+    "sketch": "tent_1272.jpg",
+    "label": "tent",
+    "class_idx": 232
+  },
+  {
+    "sketch": "anvil_0.jpg",
+    "label": "anvil",
+    "class_idx": 3
+  },
+  {
+    "sketch": "dresser_749.jpg",
+    "label": "dresser",
+    "class_idx": 75
+  },
+  {
+    "sketch": "parrot_356.jpg",
+    "label": "parrot",
+    "class_idx": 160
+  },
+  {
+    "sketch": "bridge_8027.jpg",
+    "label": "bridge",
+    "class_idx": 32
+  },
+  {
+    "sketch": "horse_33754.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "sweater_2222.jpg",
+    "label": "sweater",
+    "class_idx": 224
+  },
+  {
+    "sketch": "toe_376.jpg",
+    "label": "toe",
+    "class_idx": 235
+  },
+  {
+    "sketch": "elephant_33156.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "violin_94.jpg",
+    "label": "violin",
+    "class_idx": 250
+  },
+  {
+    "sketch": "crown_415.jpg",
+    "label": "crown",
+    "class_idx": 66
+  },
+  {
+    "sketch": "calendar_303.jpg",
+    "label": "calendar",
+    "class_idx": 41
+  },
+  {
+    "sketch": "zebra_27650.jpg",
+    "label": "zebra",
+    "class_idx": 256
+  },
+  {
+    "sketch": "potato_585.jpg",
+    "label": "potato",
+    "class_idx": 176
+  },
+  {
+    "sketch": "beach_20609.jpg",
+    "label": "beach",
+    "class_idx": 15
+  },
+  {
+    "sketch": "fork_3959.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "banana_4693.jpg",
+    "label": "banana",
+    "class_idx": 9
+  },
+  {
+    "sketch": "van_10.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "knife_4629.jpg",
+    "label": "knife",
+    "class_idx": 119
+  },
+  {
+    "sketch": "shovel_118.jpg",
+    "label": "shovel",
+    "class_idx": 196
+  },
+  {
+    "sketch": "hat_21826.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "whale_15.jpg",
+    "label": "whale",
+    "class_idx": 252
+  },
+  {
+    "sketch": "speedboat_27.jpg",
+    "label": "speedboat",
+    "class_idx": 207
+  },
+  {
+    "sketch": "bush_7410.jpg",
+    "label": "bush",
+    "class_idx": 38
+  },
+  {
+    "sketch": "umbrella_22409.jpg",
+    "label": "umbrella",
+    "class_idx": 246
+  },
+  {
+    "sketch": "keyboard_3618.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "cat_37058.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "mouse_7451.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "cat_17415.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "door_39353.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "candle_3298.jpg",
+    "label": "candle",
+    "class_idx": 46
+  },
+  {
+    "sketch": "truck_24906.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "knee_3875.jpg",
+    "label": "knee",
+    "class_idx": 118
+  },
+  {
+    "sketch": "ocean_14541.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "jacket_3648.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "bread_4675.jpg",
+    "label": "bread",
+    "class_idx": 31
+  },
+  {
+    "sketch": "hurricane_5.jpg",
+    "label": "hurricane",
+    "class_idx": 113
+  },
+  {
+    "sketch": "mosquito_6.jpg",
+    "label": "mosquito",
+    "class_idx": 141
+  },
+  {
+    "sketch": "bridge_5660.jpg",
+    "label": "bridge",
+    "class_idx": 32
+  },
+  {
+    "sketch": "grass_70854.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "elephant_33450.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "hand_40256.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "bucket_2640.jpg",
+    "label": "bucket",
+    "class_idx": 35
+  },
+  {
+    "sketch": "necklace_2874.jpg",
+    "label": "necklace",
+    "class_idx": 150
+  },
+  {
+    "sketch": "streetlight_232.jpg",
+    "label": "streetlight",
+    "class_idx": 219
+  },
+  {
+    "sketch": "canoe_569.jpg",
+    "label": "canoe",
+    "class_idx": 48
+  },
+  {
+    "sketch": "table_93200.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "pants_32517.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "nose_23616.jpg",
+    "label": "nose",
+    "class_idx": 151
+  },
+  {
+    "sketch": "wristwatch_237.jpg",
+    "label": "wristwatch",
+    "class_idx": 255
+  },
+  {
+    "sketch": "car_47217.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "line_20569.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "table_92329.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "table_93571.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "elephant_31940.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "face_24735.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "grass_70241.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "mug_3871.jpg",
+    "label": "mug",
+    "class_idx": 147
+  },
+  {
+    "sketch": "table_92596.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "grass_70856.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "cat_38503.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "cat_38132.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "beach_21676.jpg",
+    "label": "beach",
+    "class_idx": 15
+  },
+  {
+    "sketch": "leg_18988.jpg",
+    "label": "leg",
+    "class_idx": 124
+  },
+  {
+    "sketch": "table_96976.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "basket_7575.jpg",
+    "label": "basket",
+    "class_idx": 13
+  },
+  {
+    "sketch": "table_81230.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "table_92331.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "door_41372.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "chair_30287.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "skateboard_21439.jpg",
+    "label": "skateboard",
+    "class_idx": 198
+  },
+  {
+    "sketch": "skateboard_21462.jpg",
+    "label": "skateboard",
+    "class_idx": 198
+  },
+  {
+    "sketch": "door_39367.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "broccoli_2357.jpg",
+    "label": "broccoli",
+    "class_idx": 33
+  },
+  {
+    "sketch": "cello_13.jpg",
+    "label": "cello",
+    "class_idx": 53
+  },
+  {
+    "sketch": "car_55102.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "hat_32394.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "swan_123.jpg",
+    "label": "swan",
+    "class_idx": 223
+  },
+  {
+    "sketch": "cloud_3979.jpg",
+    "label": "cloud",
+    "class_idx": 58
+  },
+  {
+    "sketch": "passport_10.jpg",
+    "label": "passport",
+    "class_idx": 161
+  },
+  {
+    "sketch": "hand_47504.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "pizza_31835.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "ear_24611.jpg",
+    "label": "ear",
+    "class_idx": 78
+  },
+  {
+    "sketch": "motorbike_1583.jpg",
+    "label": "motorbike",
+    "class_idx": 142
+  },
+  {
+    "sketch": "oven_8002.jpg",
+    "label": "oven",
+    "class_idx": 154
+  },
+  {
+    "sketch": "asparagus_85.jpg",
+    "label": "asparagus",
+    "class_idx": 6
+  },
+  {
+    "sketch": "clock_34593.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "hand_45866.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "passport_0.jpg",
+    "label": "passport",
+    "class_idx": 161
+  },
+  {
+    "sketch": "bed_19544.jpg",
+    "label": "bed",
+    "class_idx": 18
+  },
+  {
+    "sketch": "anvil_1.jpg",
+    "label": "anvil",
+    "class_idx": 3
+  },
+  {
+    "sketch": "skyscraper_131.jpg",
+    "label": "skyscraper",
+    "class_idx": 200
+  },
+  {
+    "sketch": "backpack_2300.jpg",
+    "label": "backpack",
+    "class_idx": 8
+  },
+  {
+    "sketch": "toothpaste_397.jpg",
+    "label": "toothpaste",
+    "class_idx": 239
+  },
+  {
+    "sketch": "pants_34001.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "guitar_18.jpg",
+    "label": "guitar",
+    "class_idx": 100
+  },
+  {
+    "sketch": "house_16667.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "streetlight_773.jpg",
+    "label": "streetlight",
+    "class_idx": 219
+  },
+  {
+    "sketch": "steak_63.jpg",
+    "label": "steak",
+    "class_idx": 213
+  },
+  {
+    "sketch": "face_25415.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "lobster_12.jpg",
+    "label": "lobster",
+    "class_idx": 130
+  },
+  {
+    "sketch": "jacket_15100.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "vase_12994.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "skull_358.jpg",
+    "label": "skull",
+    "class_idx": 199
+  },
+  {
+    "sketch": "sheep_9456.jpg",
+    "label": "sheep",
+    "class_idx": 193
+  },
+  {
+    "sketch": "camera_10213.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "bus_45042.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "chair_31092.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "banana_6121.jpg",
+    "label": "banana",
+    "class_idx": 9
+  },
+  {
+    "sketch": "book_8107.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "suitcase_8036.jpg",
+    "label": "suitcase",
+    "class_idx": 221
+  },
+  {
+    "sketch": "skull_231.jpg",
+    "label": "skull",
+    "class_idx": 199
+  },
+  {
+    "sketch": "grass_61489.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "stairs_3741.jpg",
+    "label": "stairs",
+    "class_idx": 211
+  },
+  {
+    "sketch": "table_87108.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "laptop_17131.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "table_83261.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "helicopter_415.jpg",
+    "label": "helicopter",
+    "class_idx": 108
+  },
+  {
+    "sketch": "garden_102.jpg",
+    "label": "garden",
+    "class_idx": 95
+  },
+  {
+    "sketch": "house_16658.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "table_94057.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "banana_7902.jpg",
+    "label": "banana",
+    "class_idx": 9
+  },
+  {
+    "sketch": "tent_268.jpg",
+    "label": "tent",
+    "class_idx": 232
+  },
+  {
+    "sketch": "table_93914.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "whale_71.jpg",
+    "label": "whale",
+    "class_idx": 252
+  },
+  {
+    "sketch": "train_77600.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "grass_70837.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "helmet_23581.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "vase_14630.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "book_6078.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "door_39656.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "ladder_1555.jpg",
+    "label": "ladder",
+    "class_idx": 120
+  },
+  {
+    "sketch": "bed_23295.jpg",
+    "label": "bed",
+    "class_idx": 18
+  },
+  {
+    "sketch": "knife_5417.jpg",
+    "label": "knife",
+    "class_idx": 119
+  },
+  {
+    "sketch": "bus_52125.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "mouse_6254.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "line_15305.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "wheel_16557.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "brain_7.jpg",
+    "label": "brain",
+    "class_idx": 30
+  },
+  {
+    "sketch": "windmill_58.jpg",
+    "label": "windmill",
+    "class_idx": 254
+  },
+  {
+    "sketch": "fireplace_1.jpg",
+    "label": "fireplace",
+    "class_idx": 87
+  },
+  {
+    "sketch": "van_7552.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "dog_48039.jpg",
+    "label": "dog",
+    "class_idx": 70
+  },
+  {
+    "sketch": "rain_517.jpg",
+    "label": "rain",
+    "class_idx": 181
+  },
+  {
+    "sketch": "laptop_16750.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "nail_1284.jpg",
+    "label": "nail",
+    "class_idx": 149
+  },
+  {
+    "sketch": "keyboard_9468.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "door_37787.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "marker_289.jpg",
+    "label": "marker",
+    "class_idx": 134
+  },
+  {
+    "sketch": "panda_884.jpg",
+    "label": "panda",
+    "class_idx": 157
+  },
+  {
+    "sketch": "table_91022.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "car_55380.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "baseball_22417.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "garden_1063.jpg",
+    "label": "garden",
+    "class_idx": 95
+  },
+  {
+    "sketch": "pizza_27658.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "chandelier_6.jpg",
+    "label": "chandelier",
+    "class_idx": 55
+  },
+  {
+    "sketch": "table_94445.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "table_89949.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "pillow_4079.jpg",
+    "label": "pillow",
+    "class_idx": 169
+  },
+  {
+    "sketch": "ocean_14349.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "hand_47922.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "leg_17522.jpg",
+    "label": "leg",
+    "class_idx": 124
+  },
+  {
+    "sketch": "snowman_139.jpg",
+    "label": "snowman",
+    "class_idx": 205
+  },
+  {
+    "sketch": "pants_33392.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "snake_9.jpg",
+    "label": "snake",
+    "class_idx": 202
+  },
+  {
+    "sketch": "flower_9495.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "clock_37820.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "flower_8770.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "radio_444.jpg",
+    "label": "radio",
+    "class_idx": 180
+  },
+  {
+    "sketch": "jacket_28604.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "carrot_450.jpg",
+    "label": "carrot",
+    "class_idx": 50
+  },
+  {
+    "sketch": "horse_27055.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "table_96233.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "mouse_3869.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "camera_9568.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "chair_27581.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "car_58038.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "giraffe_32884.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "van_5979.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "face_21561.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "bus_45012.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "elephant_31637.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "shark_73.jpg",
+    "label": "shark",
+    "class_idx": 192
+  },
+  {
+    "sketch": "sandwich_3480.jpg",
+    "label": "sandwich",
+    "class_idx": 188
+  },
+  {
+    "sketch": "elephant_29453.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "line_20723.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "laptop_17119.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "ocean_14458.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "table_82115.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "bed_26579.jpg",
+    "label": "bed",
+    "class_idx": 18
+  },
+  {
+    "sketch": "stairs_11.jpg",
+    "label": "stairs",
+    "class_idx": 211
+  },
+  {
+    "sketch": "grass_72443.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "sink_18213.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "skull_438.jpg",
+    "label": "skull",
+    "class_idx": 199
+  },
+  {
+    "sketch": "train_81426.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "stove_7113.jpg",
+    "label": "stove",
+    "class_idx": 217
+  },
+  {
+    "sketch": "train_77640.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "umbrella_17429.jpg",
+    "label": "umbrella",
+    "class_idx": 246
+  },
+  {
+    "sketch": "camera_10689.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "foot_4212.jpg",
+    "label": "foot",
+    "class_idx": 92
+  },
+  {
+    "sketch": "table_87903.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "rainbow_223.jpg",
+    "label": "rainbow",
+    "class_idx": 182
+  },
+  {
+    "sketch": "shoe_12025.jpg",
+    "label": "shoe",
+    "class_idx": 194
+  },
+  {
+    "sketch": "dog_48212.jpg",
+    "label": "dog",
+    "class_idx": 70
+  },
+  {
+    "sketch": "chair_34720.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "book_7512.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "ladder_4.jpg",
+    "label": "ladder",
+    "class_idx": 120
+  },
+  {
+    "sketch": "keyboard_79.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "sink_18215.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "toilet_28604.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "sun_7525.jpg",
+    "label": "sun",
+    "class_idx": 222
+  },
+  {
+    "sketch": "feather_500.jpg",
+    "label": "feather",
+    "class_idx": 86
+  },
+  {
+    "sketch": "elephant_33452.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "pizza_27533.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "truck_26065.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "swan_364.jpg",
+    "label": "swan",
+    "class_idx": 223
+  },
+  {
+    "sketch": "tooth_367.jpg",
+    "label": "tooth",
+    "class_idx": 237
+  },
+  {
+    "sketch": "train_77602.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "house_13194.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "strawberry_63.jpg",
+    "label": "strawberry",
+    "class_idx": 218
+  },
+  {
+    "sketch": "jacket_30768.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "sandwich_9617.jpg",
+    "label": "sandwich",
+    "class_idx": 188
+  },
+  {
+    "sketch": "necklace_2563.jpg",
+    "label": "necklace",
+    "class_idx": 150
+  },
+  {
+    "sketch": "door_26833.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "mug_2960.jpg",
+    "label": "mug",
+    "class_idx": 147
+  },
+  {
+    "sketch": "table_93635.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "sock_1374.jpg",
+    "label": "sock",
+    "class_idx": 206
+  },
+  {
+    "sketch": "backpack_6108.jpg",
+    "label": "backpack",
+    "class_idx": 8
+  },
+  {
+    "sketch": "flashlight_38.jpg",
+    "label": "flashlight",
+    "class_idx": 90
+  },
+  {
+    "sketch": "mermaid_34.jpg",
+    "label": "mermaid",
+    "class_idx": 137
+  },
+  {
+    "sketch": "skyscraper_94.jpg",
+    "label": "skyscraper",
+    "class_idx": 200
+  },
+  {
+    "sketch": "train_66830.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "toothbrush_1925.jpg",
+    "label": "toothbrush",
+    "class_idx": 238
+  },
+  {
+    "sketch": "pants_25761.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "ear_24637.jpg",
+    "label": "ear",
+    "class_idx": 78
+  },
+  {
+    "sketch": "table_88588.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "cow_18838.jpg",
+    "label": "cow",
+    "class_idx": 62
+  },
+  {
+    "sketch": "wheel_6450.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "pliers_48.jpg",
+    "label": "pliers",
+    "class_idx": 172
+  },
+  {
+    "sketch": "donut_4000.jpg",
+    "label": "donut",
+    "class_idx": 72
+  },
+  {
+    "sketch": "truck_30654.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "clarinet_7.jpg",
+    "label": "clarinet",
+    "class_idx": 56
+  },
+  {
+    "sketch": "fork_6492.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "grass_70834.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "leg_17227.jpg",
+    "label": "leg",
+    "class_idx": 124
+  },
+  {
+    "sketch": "hat_29628.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "ear_24676.jpg",
+    "label": "ear",
+    "class_idx": 78
+  },
+  {
+    "sketch": "keyboard_8676.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "door_39355.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "pants_27729.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "car_53697.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "chair_30023.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "fan_11.jpg",
+    "label": "fan",
+    "class_idx": 85
+  },
+  {
+    "sketch": "clock_37840.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "cat_40290.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "cat_38387.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "spoon_577.jpg",
+    "label": "spoon",
+    "class_idx": 209
+  },
+  {
+    "sketch": "horse_25640.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "saxophone_8.jpg",
+    "label": "saxophone",
+    "class_idx": 189
+  },
+  {
+    "sketch": "potato_582.jpg",
+    "label": "potato",
+    "class_idx": 176
+  },
+  {
+    "sketch": "helmet_21105.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "mountain_11596.jpg",
+    "label": "mountain",
+    "class_idx": 143
+  },
+  {
+    "sketch": "horse_33201.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "elephant_32467.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "leaf_6155.jpg",
+    "label": "leaf",
+    "class_idx": 123
+  },
+  {
+    "sketch": "cup_16260.jpg",
+    "label": "cup",
+    "class_idx": 67
+  },
+  {
+    "sketch": "train_60654.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "umbrella_23645.jpg",
+    "label": "umbrella",
+    "class_idx": 246
+  },
+  {
+    "sketch": "bicycle_3620.jpg",
+    "label": "bicycle",
+    "class_idx": 22
+  },
+  {
+    "sketch": "van_6515.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "baseball_30146.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "table_96727.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "nail_1280.jpg",
+    "label": "nail",
+    "class_idx": 149
+  },
+  {
+    "sketch": "cat_36785.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "table_87118.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "cat_40147.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "table_71017.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "car_48039.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "car_60203.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "grass_67507.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "microwave_3748.jpg",
+    "label": "microwave",
+    "class_idx": 139
+  },
+  {
+    "sketch": "beach_21078.jpg",
+    "label": "beach",
+    "class_idx": 15
+  },
+  {
+    "sketch": "beard_2566.jpg",
+    "label": "beard",
+    "class_idx": 17
+  },
+  {
+    "sketch": "car_52173.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "onion_1027.jpg",
+    "label": "onion",
+    "class_idx": 153
+  },
+  {
+    "sketch": "toe_379.jpg",
+    "label": "toe",
+    "class_idx": 235
+  },
+  {
+    "sketch": "grass_71028.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "toilet_28053.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "car_53411.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "beach_21258.jpg",
+    "label": "beach",
+    "class_idx": 15
+  },
+  {
+    "sketch": "calendar_322.jpg",
+    "label": "calendar",
+    "class_idx": 41
+  },
+  {
+    "sketch": "postcard_14.jpg",
+    "label": "postcard",
+    "class_idx": 175
+  },
+  {
+    "sketch": "book_7559.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "banana_6045.jpg",
+    "label": "banana",
+    "class_idx": 9
+  },
+  {
+    "sketch": "cow_18357.jpg",
+    "label": "cow",
+    "class_idx": 62
+  },
+  {
+    "sketch": "bush_1535.jpg",
+    "label": "bush",
+    "class_idx": 38
+  },
+  {
+    "sketch": "table_91601.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "apple_2832.jpg",
+    "label": "apple",
+    "class_idx": 4
+  },
+  {
+    "sketch": "knife_4.jpg",
+    "label": "knife",
+    "class_idx": 119
+  },
+  {
+    "sketch": "hat_32438.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "book_6250.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "bird_20126.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "barn_909.jpg",
+    "label": "barn",
+    "class_idx": 11
+  },
+  {
+    "sketch": "table_91712.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "jacket_30343.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "eyeglasses_1494.jpg",
+    "label": "eyeglasses",
+    "class_idx": 83
+  },
+  {
+    "sketch": "door_41404.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "key_1170.jpg",
+    "label": "key",
+    "class_idx": 116
+  },
+  {
+    "sketch": "chair_21002.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "book_3952.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "keyboard_9474.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "marker_617.jpg",
+    "label": "marker",
+    "class_idx": 134
+  },
+  {
+    "sketch": "ocean_10019.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "bench_28691.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "purse_4225.jpg",
+    "label": "purse",
+    "class_idx": 177
+  },
+  {
+    "sketch": "bird_25929.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "table_92479.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "keyboard_6585.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "baseball_15425.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "table_94558.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "flower_316.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "table_98438.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "banana_8076.jpg",
+    "label": "banana",
+    "class_idx": 9
+  },
+  {
+    "sketch": "chair_27723.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "vase_14346.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "cat_37465.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "sword_96.jpg",
+    "label": "sword",
+    "class_idx": 225
+  },
+  {
+    "sketch": "steak_405.jpg",
+    "label": "steak",
+    "class_idx": 213
+  },
+  {
+    "sketch": "moustache_193.jpg",
+    "label": "moustache",
+    "class_idx": 145
+  },
+  {
+    "sketch": "truck_30731.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "arm_16605.jpg",
+    "label": "arm",
+    "class_idx": 5
+  },
+  {
+    "sketch": "ear_21083.jpg",
+    "label": "ear",
+    "class_idx": 78
+  },
+  {
+    "sketch": "pants_33681.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "hat_25847.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "pencil_520.jpg",
+    "label": "pencil",
+    "class_idx": 165
+  },
+  {
+    "sketch": "steak_453.jpg",
+    "label": "steak",
+    "class_idx": 213
+  },
+  {
+    "sketch": "arm_15259.jpg",
+    "label": "arm",
+    "class_idx": 5
+  },
+  {
+    "sketch": "underwear_116.jpg",
+    "label": "underwear",
+    "class_idx": 247
+  },
+  {
+    "sketch": "bench_22581.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "basket_7653.jpg",
+    "label": "basket",
+    "class_idx": 13
+  },
+  {
+    "sketch": "table_93020.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "car_57105.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "cat_37788.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "guitar_969.jpg",
+    "label": "guitar",
+    "class_idx": 100
+  },
+  {
+    "sketch": "cat_37568.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "apple_1822.jpg",
+    "label": "apple",
+    "class_idx": 4
+  },
+  {
+    "sketch": "toilet_25047.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "scissors_1527.jpg",
+    "label": "scissors",
+    "class_idx": 190
+  },
+  {
+    "sketch": "table_81990.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "book_7114.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "tent_1839.jpg",
+    "label": "tent",
+    "class_idx": 232
+  },
+  {
+    "sketch": "helicopter_285.jpg",
+    "label": "helicopter",
+    "class_idx": 108
+  },
+  {
+    "sketch": "eye_17515.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "flashlight_51.jpg",
+    "label": "flashlight",
+    "class_idx": 90
+  },
+  {
+    "sketch": "pants_21403.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "house_15420.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "mailbox_27.jpg",
+    "label": "mailbox",
+    "class_idx": 132
+  },
+  {
+    "sketch": "pizza_31408.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "table_87697.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "radio_445.jpg",
+    "label": "radio",
+    "class_idx": 180
+  },
+  {
+    "sketch": "ear_24314.jpg",
+    "label": "ear",
+    "class_idx": 78
+  },
+  {
+    "sketch": "spoon_5183.jpg",
+    "label": "spoon",
+    "class_idx": 209
+  },
+  {
+    "sketch": "car_50458.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "mug_3306.jpg",
+    "label": "mug",
+    "class_idx": 147
+  },
+  {
+    "sketch": "foot_5309.jpg",
+    "label": "foot",
+    "class_idx": 92
+  },
+  {
+    "sketch": "line_22011.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "mouse_6723.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "feather_286.jpg",
+    "label": "feather",
+    "class_idx": 86
+  },
+  {
+    "sketch": "bird_25916.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "garden_1341.jpg",
+    "label": "garden",
+    "class_idx": 95
+  },
+  {
+    "sketch": "cup_14049.jpg",
+    "label": "cup",
+    "class_idx": 67
+  },
+  {
+    "sketch": "grass_70894.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "ear_24313.jpg",
+    "label": "ear",
+    "class_idx": 78
+  },
+  {
+    "sketch": "zebra_27656.jpg",
+    "label": "zebra",
+    "class_idx": 256
+  },
+  {
+    "sketch": "ocean_3225.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "mug_51.jpg",
+    "label": "mug",
+    "class_idx": 147
+  },
+  {
+    "sketch": "bucket_2137.jpg",
+    "label": "bucket",
+    "class_idx": 35
+  },
+  {
+    "sketch": "helmet_24113.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "table_97437.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "helmet_16697.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "harp_0.jpg",
+    "label": "harp",
+    "class_idx": 104
+  },
+  {
+    "sketch": "pants_31008.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "camera_8370.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "bread_5407.jpg",
+    "label": "bread",
+    "class_idx": 31
+  },
+  {
+    "sketch": "car_53202.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "ladder_1883.jpg",
+    "label": "ladder",
+    "class_idx": 120
+  },
+  {
+    "sketch": "car_57007.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "calendar_192.jpg",
+    "label": "calendar",
+    "class_idx": 41
+  },
+  {
+    "sketch": "toothbrush_2276.jpg",
+    "label": "toothbrush",
+    "class_idx": 238
+  },
+  {
+    "sketch": "lion_213.jpg",
+    "label": "lion",
+    "class_idx": 128
+  },
+  {
+    "sketch": "jacket_21577.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "table_69445.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "pizza_31410.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "cat_35792.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "book_6296.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "shovel_111.jpg",
+    "label": "shovel",
+    "class_idx": 196
+  },
+  {
+    "sketch": "bus_52742.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "fan_1777.jpg",
+    "label": "fan",
+    "class_idx": 85
+  },
+  {
+    "sketch": "door_32926.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "mosquito_8.jpg",
+    "label": "mosquito",
+    "class_idx": 141
+  },
+  {
+    "sketch": "cloud_6292.jpg",
+    "label": "cloud",
+    "class_idx": 58
+  },
+  {
+    "sketch": "apple_4556.jpg",
+    "label": "apple",
+    "class_idx": 4
+  },
+  {
+    "sketch": "chair_27246.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "tooth_1.jpg",
+    "label": "tooth",
+    "class_idx": 237
+  },
+  {
+    "sketch": "kangaroo_36.jpg",
+    "label": "kangaroo",
+    "class_idx": 115
+  },
+  {
+    "sketch": "car_56621.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "chair_30782.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "hat_32446.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "train_75716.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "rhinoceros_18.jpg",
+    "label": "rhinoceros",
+    "class_idx": 184
+  },
+  {
+    "sketch": "telephone_3293.jpg",
+    "label": "telephone",
+    "class_idx": 231
+  },
+  {
+    "sketch": "wheel_13028.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "horse_23844.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "fireplace_1791.jpg",
+    "label": "fireplace",
+    "class_idx": 87
+  },
+  {
+    "sketch": "eye_16411.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "giraffe_34874.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "knee_149.jpg",
+    "label": "knee",
+    "class_idx": 118
+  },
+  {
+    "sketch": "jacket_30951.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "fork_8919.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "mouse_6427.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "face_23516.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "train_80456.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "clock_38601.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "bicycle_9324.jpg",
+    "label": "bicycle",
+    "class_idx": 22
+  },
+  {
+    "sketch": "basket_0.jpg",
+    "label": "basket",
+    "class_idx": 13
+  },
+  {
+    "sketch": "camera_10202.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "cooler_418.jpg",
+    "label": "cooler",
+    "class_idx": 61
+  },
+  {
+    "sketch": "onion_328.jpg",
+    "label": "onion",
+    "class_idx": 153
+  },
+  {
+    "sketch": "grapes_202.jpg",
+    "label": "grapes",
+    "class_idx": 98
+  },
+  {
+    "sketch": "broom_20.jpg",
+    "label": "broom",
+    "class_idx": 34
+  },
+  {
+    "sketch": "pool_789.jpg",
+    "label": "pool",
+    "class_idx": 173
+  },
+  {
+    "sketch": "hand_49618.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "oven_69.jpg",
+    "label": "oven",
+    "class_idx": 154
+  },
+  {
+    "sketch": "bus_38443.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "wheel_16587.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "angel_81.jpg",
+    "label": "angel",
+    "class_idx": 1
+  },
+  {
+    "sketch": "bench_29111.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "canoe_234.jpg",
+    "label": "canoe",
+    "class_idx": 48
+  },
+  {
+    "sketch": "helmet_23587.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "bread_5619.jpg",
+    "label": "bread",
+    "class_idx": 31
+  },
+  {
+    "sketch": "lobster_21.jpg",
+    "label": "lobster",
+    "class_idx": 130
+  },
+  {
+    "sketch": "peas_297.jpg",
+    "label": "peas",
+    "class_idx": 164
+  },
+  {
+    "sketch": "diamond_1311.jpg",
+    "label": "diamond",
+    "class_idx": 68
+  },
+  {
+    "sketch": "donut_5484.jpg",
+    "label": "donut",
+    "class_idx": 72
+  },
+  {
+    "sketch": "table_94522.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "binoculars_47.jpg",
+    "label": "binoculars",
+    "class_idx": 23
+  },
+  {
+    "sketch": "car_54346.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "foot_8292.jpg",
+    "label": "foot",
+    "class_idx": 92
+  },
+  {
+    "sketch": "key_1980.jpg",
+    "label": "key",
+    "class_idx": 116
+  },
+  {
+    "sketch": "car_48324.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "pool_21.jpg",
+    "label": "pool",
+    "class_idx": 173
+  },
+  {
+    "sketch": "castle_354.jpg",
+    "label": "castle",
+    "class_idx": 51
+  },
+  {
+    "sketch": "table_92377.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "knife_6618.jpg",
+    "label": "knife",
+    "class_idx": 119
+  },
+  {
+    "sketch": "mouse_2010.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "eye_11585.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "table_93192.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "hand_41416.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "belt_4737.jpg",
+    "label": "belt",
+    "class_idx": 20
+  },
+  {
+    "sketch": "mountain_10901.jpg",
+    "label": "mountain",
+    "class_idx": 143
+  },
+  {
+    "sketch": "chair_24993.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "bicycle_8777.jpg",
+    "label": "bicycle",
+    "class_idx": 22
+  },
+  {
+    "sketch": "door_28266.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "piano_620.jpg",
+    "label": "piano",
+    "class_idx": 167
+  },
+  {
+    "sketch": "house_16581.jpg",
+    "label": "house",
+    "class_idx": 112
+  },
+  {
+    "sketch": "skull_347.jpg",
+    "label": "skull",
+    "class_idx": 199
+  },
+  {
+    "sketch": "crayon_97.jpg",
+    "label": "crayon",
+    "class_idx": 64
+  },
+  {
+    "sketch": "cup_13301.jpg",
+    "label": "cup",
+    "class_idx": 67
+  },
+  {
+    "sketch": "sweater_3885.jpg",
+    "label": "sweater",
+    "class_idx": 224
+  },
+  {
+    "sketch": "helmet_22322.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "bench_28461.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "grass_70276.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "van_7853.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "elephant_32618.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "drums_42.jpg",
+    "label": "drums",
+    "class_idx": 76
+  },
+  {
+    "sketch": "mug_2732.jpg",
+    "label": "mug",
+    "class_idx": 147
+  },
+  {
+    "sketch": "helmet_21369.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "lion_514.jpg",
+    "label": "lion",
+    "class_idx": 128
+  },
+  {
+    "sketch": "mosquito_13.jpg",
+    "label": "mosquito",
+    "class_idx": 141
+  },
+  {
+    "sketch": "face_23051.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "chair_30381.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "bus_50428.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "train_77019.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "shorts_22389.jpg",
+    "label": "shorts",
+    "class_idx": 195
+  },
+  {
+    "sketch": "clock_37788.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "grass_70864.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "rainbow_787.jpg",
+    "label": "rainbow",
+    "class_idx": 182
+  },
+  {
+    "sketch": "train_71170.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "bandage_83.jpg",
+    "label": "bandage",
+    "class_idx": 10
+  },
+  {
+    "sketch": "sink_19001.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "frog_130.jpg",
+    "label": "frog",
+    "class_idx": 94
+  },
+  {
+    "sketch": "baseball_25541.jpg",
+    "label": "baseball",
+    "class_idx": 12
+  },
+  {
+    "sketch": "fork_4131.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "dishwasher_688.jpg",
+    "label": "dishwasher",
+    "class_idx": 69
+  },
+  {
+    "sketch": "angel_224.jpg",
+    "label": "angel",
+    "class_idx": 1
+  },
+  {
+    "sketch": "scissors_3543.jpg",
+    "label": "scissors",
+    "class_idx": 190
+  },
+  {
+    "sketch": "guitar_0.jpg",
+    "label": "guitar",
+    "class_idx": 100
+  },
+  {
+    "sketch": "table_88012.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "wheel_18043.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "shoe_7952.jpg",
+    "label": "shoe",
+    "class_idx": 194
+  },
+  {
+    "sketch": "onion_1717.jpg",
+    "label": "onion",
+    "class_idx": 153
+  },
+  {
+    "sketch": "table_93931.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "arm_17151.jpg",
+    "label": "arm",
+    "class_idx": 5
+  },
+  {
+    "sketch": "passport_13.jpg",
+    "label": "passport",
+    "class_idx": 161
+  },
+  {
+    "sketch": "apple_6575.jpg",
+    "label": "apple",
+    "class_idx": 4
+  },
+  {
+    "sketch": "keyboard_4047.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "book_7814.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "hammer_106.jpg",
+    "label": "hammer",
+    "class_idx": 102
+  },
+  {
+    "sketch": "chair_30723.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "car_53890.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "toilet_20408.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "broccoli_5806.jpg",
+    "label": "broccoli",
+    "class_idx": 33
+  },
+  {
+    "sketch": "skateboard_21463.jpg",
+    "label": "skateboard",
+    "class_idx": 198
+  },
+  {
+    "sketch": "door_39384.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "donut_5162.jpg",
+    "label": "donut",
+    "class_idx": 72
+  },
+  {
+    "sketch": "pizza_30290.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "mouse_10.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "saxophone_9.jpg",
+    "label": "saxophone",
+    "class_idx": 189
+  },
+  {
+    "sketch": "face_17146.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "whale_66.jpg",
+    "label": "whale",
+    "class_idx": 252
+  },
+  {
+    "sketch": "bed_17588.jpg",
+    "label": "bed",
+    "class_idx": 18
+  },
+  {
+    "sketch": "microwave_3249.jpg",
+    "label": "microwave",
+    "class_idx": 139
+  },
+  {
+    "sketch": "t-shirt_6236.jpg",
+    "label": "t-shirt",
+    "class_idx": 227
+  },
+  {
+    "sketch": "parachute_298.jpg",
+    "label": "parachute",
+    "class_idx": 159
+  },
+  {
+    "sketch": "table_81206.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "eye_21237.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "bush_1251.jpg",
+    "label": "bush",
+    "class_idx": 38
+  },
+  {
+    "sketch": "bridge_8264.jpg",
+    "label": "bridge",
+    "class_idx": 32
+  },
+  {
+    "sketch": "hat_31921.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "wheel_18621.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "table_96438.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "giraffe_35635.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "truck_27704.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "jacket_31843.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "door_35253.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "dolphin_81.jpg",
+    "label": "dolphin",
+    "class_idx": 71
+  },
+  {
+    "sketch": "pizza_23982.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "toilet_28038.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "whale_27.jpg",
+    "label": "whale",
+    "class_idx": 252
+  },
+  {
+    "sketch": "wheel_16428.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "flower_12381.jpg",
+    "label": "flower",
+    "class_idx": 91
+  },
+  {
+    "sketch": "cat_38880.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "clock_35941.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "stethoscope_5.jpg",
+    "label": "stethoscope",
+    "class_idx": 215
+  },
+  {
+    "sketch": "bear_32880.jpg",
+    "label": "bear",
+    "class_idx": 16
+  },
+  {
+    "sketch": "frog_62.jpg",
+    "label": "frog",
+    "class_idx": 94
+  },
+  {
+    "sketch": "sheep_12779.jpg",
+    "label": "sheep",
+    "class_idx": 193
+  },
+  {
+    "sketch": "pizza_7343.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "book_5980.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "clock_39207.jpg",
+    "label": "clock",
+    "class_idx": 57
+  },
+  {
+    "sketch": "giraffe_35880.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "toilet_21282.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "train_78210.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "lobster_89.jpg",
+    "label": "lobster",
+    "class_idx": 130
+  },
+  {
+    "sketch": "sun_7515.jpg",
+    "label": "sun",
+    "class_idx": 222
+  },
+  {
+    "sketch": "chair_24294.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "jacket_30969.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "truck_30641.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "bus_36846.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "necklace_2046.jpg",
+    "label": "necklace",
+    "class_idx": 150
+  },
+  {
+    "sketch": "grapes_6.jpg",
+    "label": "grapes",
+    "class_idx": 98
+  },
+  {
+    "sketch": "stereo_189.jpg",
+    "label": "stereo",
+    "class_idx": 214
+  },
+  {
+    "sketch": "drums_24.jpg",
+    "label": "drums",
+    "class_idx": 76
+  },
+  {
+    "sketch": "matches_132.jpg",
+    "label": "matches",
+    "class_idx": 135
+  },
+  {
+    "sketch": "cow_18713.jpg",
+    "label": "cow",
+    "class_idx": 62
+  },
+  {
+    "sketch": "bridge_4499.jpg",
+    "label": "bridge",
+    "class_idx": 32
+  },
+  {
+    "sketch": "foot_10494.jpg",
+    "label": "foot",
+    "class_idx": 92
+  },
+  {
+    "sketch": "flashlight_62.jpg",
+    "label": "flashlight",
+    "class_idx": 90
+  },
+  {
+    "sketch": "mountain_5197.jpg",
+    "label": "mountain",
+    "class_idx": 143
+  },
+  {
+    "sketch": "bear_35401.jpg",
+    "label": "bear",
+    "class_idx": 16
+  },
+  {
+    "sketch": "line_22224.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "table_90828.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "face_26641.jpg",
+    "label": "face",
+    "class_idx": 84
+  },
+  {
+    "sketch": "chair_24281.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "telephone_3187.jpg",
+    "label": "telephone",
+    "class_idx": 231
+  },
+  {
+    "sketch": "horse_17270.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "bench_29098.jpg",
+    "label": "bench",
+    "class_idx": 21
+  },
+  {
+    "sketch": "purse_2.jpg",
+    "label": "purse",
+    "class_idx": 177
+  },
+  {
+    "sketch": "umbrella_21822.jpg",
+    "label": "umbrella",
+    "class_idx": 246
+  },
+  {
+    "sketch": "goatee_199.jpg",
+    "label": "goatee",
+    "class_idx": 97
+  },
+  {
+    "sketch": "pizza_24366.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "chair_30647.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "wristwatch_60.jpg",
+    "label": "wristwatch",
+    "class_idx": 255
+  },
+  {
+    "sketch": "eye_17105.jpg",
+    "label": "eye",
+    "class_idx": 82
+  },
+  {
+    "sketch": "bandage_118.jpg",
+    "label": "bandage",
+    "class_idx": 10
+  },
+  {
+    "sketch": "fork_4920.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "necklace_2468.jpg",
+    "label": "necklace",
+    "class_idx": 150
+  },
+  {
+    "sketch": "mountain_10891.jpg",
+    "label": "mountain",
+    "class_idx": 143
+  },
+  {
+    "sketch": "hat_30347.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "pool_1555.jpg",
+    "label": "pool",
+    "class_idx": 173
+  },
+  {
+    "sketch": "pliers_53.jpg",
+    "label": "pliers",
+    "class_idx": 172
+  },
+  {
+    "sketch": "jacket_30961.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "grass_63125.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "train_72905.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "helmet_19783.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "car_46248.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "mailbox_232.jpg",
+    "label": "mailbox",
+    "class_idx": 132
+  },
+  {
+    "sketch": "helmet_24809.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "bird_22623.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "stairs_2103.jpg",
+    "label": "stairs",
+    "class_idx": 211
+  },
+  {
+    "sketch": "nose_23872.jpg",
+    "label": "nose",
+    "class_idx": 151
+  },
+  {
+    "sketch": "bird_20043.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "shorts_22192.jpg",
+    "label": "shorts",
+    "class_idx": 195
+  },
+  {
+    "sketch": "giraffe_34865.jpg",
+    "label": "giraffe",
+    "class_idx": 96
+  },
+  {
+    "sketch": "crab_144.jpg",
+    "label": "crab",
+    "class_idx": 63
+  },
+  {
+    "sketch": "train_77463.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "book_7385.jpg",
+    "label": "book",
+    "class_idx": 27
+  },
+  {
+    "sketch": "door_31860.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "crocodile_7.jpg",
+    "label": "crocodile",
+    "class_idx": 65
+  },
+  {
+    "sketch": "grass_68499.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "leg_18219.jpg",
+    "label": "leg",
+    "class_idx": 124
+  },
+  {
+    "sketch": "keyboard_1321.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "bird_25927.jpg",
+    "label": "bird",
+    "class_idx": 24
+  },
+  {
+    "sketch": "pool_931.jpg",
+    "label": "pool",
+    "class_idx": 173
+  },
+  {
+    "sketch": "basket_7408.jpg",
+    "label": "basket",
+    "class_idx": 13
+  },
+  {
+    "sketch": "leg_18215.jpg",
+    "label": "leg",
+    "class_idx": 124
+  },
+  {
+    "sketch": "hand_47961.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "bicycle_376.jpg",
+    "label": "bicycle",
+    "class_idx": 22
+  },
+  {
+    "sketch": "oven_8298.jpg",
+    "label": "oven",
+    "class_idx": 154
+  },
+  {
+    "sketch": "shorts_20532.jpg",
+    "label": "shorts",
+    "class_idx": 195
+  },
+  {
+    "sketch": "crown_414.jpg",
+    "label": "crown",
+    "class_idx": 66
+  },
+  {
+    "sketch": "toaster_1172.jpg",
+    "label": "toaster",
+    "class_idx": 234
+  },
+  {
+    "sketch": "grass_73913.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "leaf_1811.jpg",
+    "label": "leaf",
+    "class_idx": 123
+  },
+  {
+    "sketch": "marker_152.jpg",
+    "label": "marker",
+    "class_idx": 134
+  },
+  {
+    "sketch": "angel_129.jpg",
+    "label": "angel",
+    "class_idx": 1
+  },
+  {
+    "sketch": "table_92165.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "car_38432.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "grass_74234.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "potato_807.jpg",
+    "label": "potato",
+    "class_idx": 176
+  },
+  {
+    "sketch": "jacket_23767.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "car_59911.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "grass_71919.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "vase_10222.jpg",
+    "label": "vase",
+    "class_idx": 249
+  },
+  {
+    "sketch": "ocean_14738.jpg",
+    "label": "ocean",
+    "class_idx": 152
+  },
+  {
+    "sketch": "beach_20584.jpg",
+    "label": "beach",
+    "class_idx": 15
+  },
+  {
+    "sketch": "hat_32416.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "door_37777.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "penguin_231.jpg",
+    "label": "penguin",
+    "class_idx": 166
+  },
+  {
+    "sketch": "table_94300.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "rhinoceros_0.jpg",
+    "label": "rhinoceros",
+    "class_idx": 184
+  },
+  {
+    "sketch": "zebra_12171.jpg",
+    "label": "zebra",
+    "class_idx": 256
+  },
+  {
+    "sketch": "table_88511.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "bandage_12.jpg",
+    "label": "bandage",
+    "class_idx": 10
+  },
+  {
+    "sketch": "suitcase_8316.jpg",
+    "label": "suitcase",
+    "class_idx": 221
+  },
+  {
+    "sketch": "bed_26898.jpg",
+    "label": "bed",
+    "class_idx": 18
+  },
+  {
+    "sketch": "pear_95.jpg",
+    "label": "pear",
+    "class_idx": 163
+  },
+  {
+    "sketch": "wheel_14494.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "pizza_30932.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "stairs_1.jpg",
+    "label": "stairs",
+    "class_idx": 211
+  },
+  {
+    "sketch": "hat_24026.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "toilet_26990.jpg",
+    "label": "toilet",
+    "class_idx": 236
+  },
+  {
+    "sketch": "cat_28688.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "door_39357.jpg",
+    "label": "door",
+    "class_idx": 73
+  },
+  {
+    "sketch": "table_92215.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "basket_8866.jpg",
+    "label": "basket",
+    "class_idx": 13
+  },
+  {
+    "sketch": "grass_65818.jpg",
+    "label": "grass",
+    "class_idx": 99
+  },
+  {
+    "sketch": "table_94444.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "hat_33168.jpg",
+    "label": "hat",
+    "class_idx": 105
+  },
+  {
+    "sketch": "horse_30682.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "fork_8859.jpg",
+    "label": "fork",
+    "class_idx": 93
+  },
+  {
+    "sketch": "cooler_94.jpg",
+    "label": "cooler",
+    "class_idx": 61
+  },
+  {
+    "sketch": "river_5065.jpg",
+    "label": "river",
+    "class_idx": 186
+  },
+  {
+    "sketch": "train_81125.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "shorts_23183.jpg",
+    "label": "shorts",
+    "class_idx": 195
+  },
+  {
+    "sketch": "sheep_17105.jpg",
+    "label": "sheep",
+    "class_idx": 193
+  },
+  {
+    "sketch": "stereo_220.jpg",
+    "label": "stereo",
+    "class_idx": 214
+  },
+  {
+    "sketch": "chair_30096.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "cloud_4898.jpg",
+    "label": "cloud",
+    "class_idx": 58
+  },
+  {
+    "sketch": "table_92461.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "camouflage_253.jpg",
+    "label": "camouflage",
+    "class_idx": 44
+  },
+  {
+    "sketch": "bee_22.jpg",
+    "label": "bee",
+    "class_idx": 19
+  },
+  {
+    "sketch": "oven_7996.jpg",
+    "label": "oven",
+    "class_idx": 154
+  },
+  {
+    "sketch": "camera_2799.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "pants_32530.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "jacket_20413.jpg",
+    "label": "jacket",
+    "class_idx": 114
+  },
+  {
+    "sketch": "table_98373.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "train_71835.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "table_93848.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "nose_19291.jpg",
+    "label": "nose",
+    "class_idx": 151
+  },
+  {
+    "sketch": "pants_29017.jpg",
+    "label": "pants",
+    "class_idx": 158
+  },
+  {
+    "sketch": "sink_1805.jpg",
+    "label": "sink",
+    "class_idx": 197
+  },
+  {
+    "sketch": "car_48989.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "bush_5889.jpg",
+    "label": "bush",
+    "class_idx": 38
+  },
+  {
+    "sketch": "pizza_31413.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "cat_24314.jpg",
+    "label": "cat",
+    "class_idx": 52
+  },
+  {
+    "sketch": "helmet_22987.jpg",
+    "label": "helmet",
+    "class_idx": 109
+  },
+  {
+    "sketch": "line_18338.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "cup_12852.jpg",
+    "label": "cup",
+    "class_idx": 67
+  },
+  {
+    "sketch": "stereo_84.jpg",
+    "label": "stereo",
+    "class_idx": 214
+  },
+  {
+    "sketch": "line_22207.jpg",
+    "label": "line",
+    "class_idx": 127
+  },
+  {
+    "sketch": "table_91626.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "leg_18220.jpg",
+    "label": "leg",
+    "class_idx": 124
+  },
+  {
+    "sketch": "car_57123.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "car_56889.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "camera_10648.jpg",
+    "label": "camera",
+    "class_idx": 43
+  },
+  {
+    "sketch": "car_56574.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "flashlight_58.jpg",
+    "label": "flashlight",
+    "class_idx": 90
+  },
+  {
+    "sketch": "bracelet_2361.jpg",
+    "label": "bracelet",
+    "class_idx": 29
+  },
+  {
+    "sketch": "bed_15969.jpg",
+    "label": "bed",
+    "class_idx": 18
+  },
+  {
+    "sketch": "tractor_150.jpg",
+    "label": "tractor",
+    "class_idx": 241
+  },
+  {
+    "sketch": "scissors_2319.jpg",
+    "label": "scissors",
+    "class_idx": 190
+  },
+  {
+    "sketch": "mountain_10895.jpg",
+    "label": "mountain",
+    "class_idx": 143
+  },
+  {
+    "sketch": "horse_32751.jpg",
+    "label": "horse",
+    "class_idx": 110
+  },
+  {
+    "sketch": "nose_23000.jpg",
+    "label": "nose",
+    "class_idx": 151
+  },
+  {
+    "sketch": "elephant_19695.jpg",
+    "label": "elephant",
+    "class_idx": 80
+  },
+  {
+    "sketch": "telephone_2766.jpg",
+    "label": "telephone",
+    "class_idx": 231
+  },
+  {
+    "sketch": "duck_0.jpg",
+    "label": "duck",
+    "class_idx": 77
+  },
+  {
+    "sketch": "snake_90.jpg",
+    "label": "snake",
+    "class_idx": 202
+  },
+  {
+    "sketch": "van_7721.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "basket_5602.jpg",
+    "label": "basket",
+    "class_idx": 13
+  },
+  {
+    "sketch": "table_84347.jpg",
+    "label": "table",
+    "class_idx": 228
+  },
+  {
+    "sketch": "bus_50108.jpg",
+    "label": "bus",
+    "class_idx": 37
+  },
+  {
+    "sketch": "chair_19317.jpg",
+    "label": "chair",
+    "class_idx": 54
+  },
+  {
+    "sketch": "mouse_7057.jpg",
+    "label": "mouse",
+    "class_idx": 144
+  },
+  {
+    "sketch": "compass_22.jpg",
+    "label": "compass",
+    "class_idx": 59
+  },
+  {
+    "sketch": "owl_422.jpg",
+    "label": "owl",
+    "class_idx": 155
+  },
+  {
+    "sketch": "laptop_16990.jpg",
+    "label": "laptop",
+    "class_idx": 122
+  },
+  {
+    "sketch": "peanut_181.jpg",
+    "label": "peanut",
+    "class_idx": 162
+  },
+  {
+    "sketch": "wheel_18029.jpg",
+    "label": "wheel",
+    "class_idx": 253
+  },
+  {
+    "sketch": "train_81059.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "van_7542.jpg",
+    "label": "van",
+    "class_idx": 248
+  },
+  {
+    "sketch": "stove_8468.jpg",
+    "label": "stove",
+    "class_idx": 217
+  },
+  {
+    "sketch": "train_74443.jpg",
+    "label": "train",
+    "class_idx": 242
+  },
+  {
+    "sketch": "shorts_9587.jpg",
+    "label": "shorts",
+    "class_idx": 195
+  },
+  {
+    "sketch": "car_47885.jpg",
+    "label": "car",
+    "class_idx": 49
+  },
+  {
+    "sketch": "truck_28333.jpg",
+    "label": "truck",
+    "class_idx": 244
+  },
+  {
+    "sketch": "hand_47929.jpg",
+    "label": "hand",
+    "class_idx": 103
+  },
+  {
+    "sketch": "keyboard_7576.jpg",
+    "label": "keyboard",
+    "class_idx": 117
+  },
+  {
+    "sketch": "pizza_26287.jpg",
+    "label": "pizza",
+    "class_idx": 171
+  },
+  {
+    "sketch": "bus_52353.jpg",
+    "label": "bus",
+    "class_idx": 37
+  }
+]

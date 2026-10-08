@@ -203,7 +203,12 @@ def run_table3_evaluation(model_path: str = None, split: str = "both"):
     device = "cuda" if torch.cuda.is_available() else "cpu"
     print(f"Device: {device}")
     
-    model = STNet(num_classes=258, device=device, pretrained_sketch=False).to(device)
+    model = STNet(
+        num_classes=258,
+        device=device,
+        pretrained_sketch=True,
+        sketch_encoder_ckpt="CSTBIR/checkpoints/sketch_encoder_quickdraw_adapted.pt"
+    ).to(device)
     if model_path and os.path.exists(model_path):
         print(f"Loading weights from {model_path}...")
         ckpt = torch.load(model_path, map_location=device)

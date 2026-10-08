@@ -66,7 +66,12 @@ def run_ablation():
         print(f"\n[Evaluating {name} on Test-1K...]")
         t_eval = time.time()
         
-        eval_model = STNet(num_classes=258, device=device, pretrained_sketch=False).to(device)
+        eval_model = STNet(
+            num_classes=258,
+            device=device,
+            pretrained_sketch=True,
+            sketch_encoder_ckpt="CSTBIR/checkpoints/sketch_encoder_quickdraw_adapted.pt"
+        ).to(device)
         ckpt = torch.load(ckpt_path, map_location=device)
         eval_model.load_state_dict(ckpt.get('model_state_dict', ckpt))
         

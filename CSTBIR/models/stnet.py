@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -36,7 +37,9 @@ class STNet(nn.Module):
         clip_model_name: str = "ViT-B/16",
         num_classes: int = 258,
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
-        pretrained_sketch: bool = False
+        pretrained_sketch: bool = True,
+        sketch_encoder_ckpt: Optional[str] = None,
+        clamp_min: Optional[float] = 1.0
     ):
         super().__init__()
         self.device = device
@@ -50,8 +53,13 @@ class STNet(nn.Module):
         self.img_dim = self.clip_model.visual.transformer.width # 768
         
         # 2. Sketch Encoder (ViT pretrained on ImageNet-21K, adapted to QuickDraw 258 classes)
-        print(f"[STNet] Initializing SketchEncoder (258 classes, embed_dim={self.img_dim})...")
+        print(f"[STNet] Initializing SketchEncoder (258 classes, embed_dim={self.img_dim}, pretrained={pretrained_sketch})...")
         self.sketch_encoder = SketchEncoder(num_classes=num_classes, pretrained=pretrained_sketch).to(device)
+        if sketch_encoder_ckpt and os.path.exists(sketch_encoder_ckpt):
+            sd = torch.load(sketch_encoder_ckpt, map_location=device)
+            state_dict = sd.get('model_state_dict', sd)
+            load_res = self.sketch_encoder.load_state_dict(state_dict, strict=True)
+            print(f"[STNet] Loaded QuickDraw-adapted sketch encoder from {sketch_encoder_ckpt} (strict=True, missing={len(load_res.missing_keys)}, unexpected={len(load_res.unexpected_keys)})")
         
         # 3. Cross-Modal Attention: alpha_IS = Softmax(H~^I x h^S_{CLS})
         self.cross_attention = SketchGuidedImageAttention(embed_dim=self.img_dim, scale=False).to(device)
@@ -70,7 +78,7 @@ class STNet(nn.Module):
         ).to(device)
         
         # Loss Modules
-        self.loss_ct_fn = ContrastiveRetrievalLoss(text_dim=self.text_dim, img_dim=self.img_dim, proj_dim=self.text_dim).to(device)
+        self.loss_ct_fn = ContrastiveRetrievalLoss(text_dim=self.text_dim, img_dim=self.img_dim, proj_dim=self.text_dim, clamp_min=clamp_min).to(device)
         self.loss_cls_fn = ObjectClassificationLoss().to(device)
         self.loss_od_fn = YoloDetectionLoss(grid_size=7, num_boxes=2, num_classes=num_classes).to(device)
         self.loss_sr_fn = SketchReconstructionLoss(alpha=1.0, beta=1.0).to(device)

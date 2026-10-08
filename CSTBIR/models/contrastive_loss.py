@@ -1,4 +1,5 @@
 import math
+from typing import Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -27,9 +28,11 @@ class ContrastiveRetrievalLoss(nn.Module):
         img_dim: int = 768,
         proj_dim: int = 512,
         init_temperature: float = 0.07,
-        learnable_temp: bool = True
+        learnable_temp: bool = True,
+        clamp_min: Optional[float] = 1.0
     ):
         super().__init__()
+        self.clamp_min = clamp_min
         # If dimensions differ, project image features to match text retrieval dimension
         if img_dim != proj_dim:
             self.img_proj = nn.Linear(img_dim, proj_dim, bias=False)
@@ -73,7 +76,10 @@ class ContrastiveRetrievalLoss(nn.Module):
         z_i = F.normalize(z_i, p=2, dim=-1)
         
         # 3. Scale logits by learned temperature
-        logit_scale = torch.clamp(self.logit_scale.exp(), max=100.0)
+        if self.clamp_min is not None and self.clamp_min > 0:
+            logit_scale = torch.clamp(self.logit_scale.exp(), min=self.clamp_min, max=100.0)
+        else:
+            logit_scale = torch.clamp(self.logit_scale.exp(), max=100.0)
         
         # Cosine similarity matrix: (B, B)
         logits_per_text = logit_scale * (z_t @ z_i.T)

@@ -134,7 +134,10 @@ def train_stnet(
     epochs_override: Optional[int] = None,
     patience: int = 4,
     min_epochs: int = 5,
-    diag_samples: int = 200
+    diag_samples: int = 200,
+    pretrained_sketch: bool = True,
+    sketch_encoder_ckpt: Optional[str] = "CSTBIR/checkpoints/sketch_encoder_quickdraw_adapted.pt",
+    clamp_min: Optional[float] = 1.0
 ) -> Tuple[Dict[str, List[float]], str]:
     # 0. Set seed for deterministic initialization & batch sequences
     set_seed(seed)
@@ -148,6 +151,7 @@ def train_stnet(
     print(f"=== STNet Training (AAAI 2024 Reimplementation) ===")
     print(f"Run Name:  {run_name if run_name else 'default'}")
     print(f"lambda_od: {lambda_od} | Seed: {seed} | Device: {device}")
+    print(f"pretrained_sketch: {pretrained_sketch} | sketch_ckpt: {sketch_encoder_ckpt} | clamp_min: {clamp_min}")
     print("=" * 70)
     
     base_save_dir = cfg["training"]["save_dir"]
@@ -159,7 +163,9 @@ def train_stnet(
         clip_model_name=cfg["model"]["clip_model_name"],
         num_classes=cfg["model"]["num_classes"],
         device=device,
-        pretrained_sketch=False
+        pretrained_sketch=pretrained_sketch,
+        sketch_encoder_ckpt=sketch_encoder_ckpt,
+        clamp_min=clamp_min
     )
     
     # 2. Datasets
@@ -203,13 +209,15 @@ def train_stnet(
     print(f"Training split queries: {len(train_ds)} | Test-1K queries: {len(val_ds)}")
     
     # 4. Diagnostic Evaluator on Held-Out Test-1K
-    diag_evaluator = DiagnosticEvaluator(
-        json_path=json_path,
-        images_dir=cfg["data"]["images_dir"],
-        sketches_dir=cfg["data"]["sketches_dir"],
-        num_queries=diag_samples,
-        device=device
-    )
+    diag_evaluator = None
+    if diag_samples > 0:
+        diag_evaluator = DiagnosticEvaluator(
+            json_path=json_path,
+            images_dir=cfg["data"]["images_dir"],
+            sketches_dir=cfg["data"]["sketches_dir"],
+            num_queries=diag_samples,
+            device=device
+        )
     
     # History logs for all loss terms & diagnostic metrics
     history = {
@@ -222,7 +230,8 @@ def train_stnet(
         'loss_sr': [],
         'diag_r10': [],
         'diag_r20': [],
-        'diag_mdr': []
+        'diag_mdr': [],
+        'logit_scale': []
     }
     
     best_ckpt_path = os.path.join(save_dir, "stnet_best.pt")
@@ -292,18 +301,28 @@ def train_stnet(
         print(f"  L_CLS^I:     {history['loss_cls_i'][-1]:.4f}")
         print(f"  L_OD (raw):  {history['loss_od'][-1]:.4f}")
         print(f"  L_SR:        {history['loss_sr'][-1]:.4f}")
+        logit_scale_val = model.loss_ct_fn.logit_scale.exp().item()
+        history['logit_scale'].append(logit_scale_val)
+        print(f"  logit_scale (temp^-1): {logit_scale_val:.4f}")
         
-        # Run held-out diagnostic evaluation
-        diag_metrics, diag_time = diag_evaluator.evaluate(model)
-        diag_r10 = diag_metrics['R@10']
-        diag_r20 = diag_metrics['R@20']
-        diag_mdr = diag_metrics['MdR']
-        
-        history['diag_r10'].append(diag_r10)
-        history['diag_r20'].append(diag_r20)
-        history['diag_mdr'].append(diag_mdr)
-        
-        print(f"  >>> Held-Out Diagnostic (200-sample): R@10 = {diag_r10:5.2f}% (238-img Baseline: 4.50%) | R@20 = {diag_r20:5.2f}% | MdR = {diag_mdr:5.1f} ({diag_time:.1f}s)")
+        # Run held-out diagnostic evaluation if enabled
+        if diag_evaluator is not None:
+            diag_metrics, diag_time = diag_evaluator.evaluate(model)
+            diag_r10 = diag_metrics['R@10']
+            diag_r20 = diag_metrics['R@20']
+            diag_mdr = diag_metrics['MdR']
+            
+            history['diag_r10'].append(diag_r10)
+            history['diag_r20'].append(diag_r20)
+            history['diag_mdr'].append(diag_mdr)
+            
+            print(f"  >>> Held-Out Diagnostic ({diag_samples}-sample): R@10 = {diag_r10:5.2f}% (238-img Baseline: 4.50%) | R@20 = {diag_r20:5.2f}% | MdR = {diag_mdr:5.1f} ({diag_time:.1f}s)")
+            is_best = diag_r10 > best_diag_r10
+            if is_best:
+                best_diag_r10 = diag_r10
+        else:
+            diag_metrics = {}
+            is_best = (history['loss_ct'][-1] == min(history['loss_ct']))
         
         # Save epoch checkpoint
         ckpt_path = os.path.join(save_dir, f"stnet_epoch_{epoch+1}.pt")
@@ -317,9 +336,8 @@ def train_stnet(
             'diag_metrics': diag_metrics
         }, ckpt_path)
         
-        # Save best model based on diagnostic R@10
-        if diag_r10 > best_diag_r10:
-            best_diag_r10 = diag_r10
+        # Save best model
+        if is_best:
             best_epoch = epoch + 1
             patience_counter = 0
             torch.save({
@@ -331,12 +349,14 @@ def train_stnet(
                 'seed': seed,
                 'diag_metrics': diag_metrics
             }, best_ckpt_path)
-            print(f"  * New best diagnostic R@10 ({diag_r10:.2f}%)! Saved to {best_ckpt_path}")
+            metric_str = f"diagnostic R@10 ({best_diag_r10:.2f}%)" if diag_evaluator else f"L_CT ({history['loss_ct'][-1]:.4f})"
+            print(f"  * New best {metric_str}! Saved to {best_ckpt_path}")
         else:
             patience_counter += 1
-            print(f"  Patience: {patience_counter}/{patience} (Best R@10: {best_diag_r10:.2f}% at Epoch {best_epoch})")
+            if diag_evaluator is not None:
+                print(f"  Patience: {patience_counter}/{patience} (Best R@10: {best_diag_r10:.2f}% at Epoch {best_epoch})")
             if patience_counter >= patience and (epoch + 1) >= min_epochs:
-                print(f"\n[Early Stopping Triggered] Diagnostic R@10 has not improved for {patience} epochs.")
+                print(f"\n[Early Stopping Triggered] Has not improved for {patience} epochs.")
                 break
             
         # Save history json
@@ -357,7 +377,13 @@ if __name__ == "__main__":
     parser.add_argument("--patience", type=int, default=4)
     parser.add_argument("--min_epochs", type=int, default=5)
     parser.add_argument("--diag_samples", type=int, default=200)
+    parser.add_argument("--pretrained_sketch", action="store_true", default=True)
+    parser.add_argument("--no_pretrained_sketch", dest="pretrained_sketch", action="store_false")
+    parser.add_argument("--sketch_encoder_ckpt", type=str, default="CSTBIR/checkpoints/sketch_encoder_quickdraw_adapted.pt")
+    parser.add_argument("--clamp_min", type=float, default=1.0)
     args = parser.parse_args()
+    
+    ckpt_arg = args.sketch_encoder_ckpt if args.pretrained_sketch else None
     train_stnet(
         config_path=args.config,
         lambda_od=args.lambda_od,
@@ -366,5 +392,8 @@ if __name__ == "__main__":
         epochs_override=args.epochs,
         patience=args.patience,
         min_epochs=args.min_epochs,
-        diag_samples=args.diag_samples
+        diag_samples=args.diag_samples,
+        pretrained_sketch=args.pretrained_sketch,
+        sketch_encoder_ckpt=ckpt_arg,
+        clamp_min=args.clamp_min
     )
